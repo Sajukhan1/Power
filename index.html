@@ -3,82 +3,123 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube Studio Panel</title>
+  <title>YouTube CMS Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
     body {
-      font-family: 'Inter', sans-serif;
       background: #0f0f0f;
       color: white;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-image: linear-gradient(145deg, #111, #000);
+      font-family: 'Inter', sans-serif;
+      padding: 2rem;
     }
-    .card {
-      background: #1c1c1c;
-      padding: 2.5rem;
-      border-radius: 14px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-      text-align: center;
-      width: 90%;
-      max-width: 360px;
-    }
-    .card h1 {
-      font-size: 1.6rem;
-      margin-bottom: 1.5rem;
+    h1 {
       color: #ffcc00;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
-    .login-btn {
-      background: linear-gradient(-45deg, #ff4e50, #f9d423, #24c6dc, #5433ff);
-      background-size: 400% 400%;
-      color: #fff;
-      font-weight: bold;
+    .video-card {
+      background: #1c1c1c;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+    }
+    .video-card h2 {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+    .restriction-btn {
+      background: crimson;
       border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 6px;
-      font-size: 1rem;
+      padding: 0.5rem 1rem;
+      color: white;
+      border-radius: 4px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      animation: gradientShift 6s ease infinite;
+      font-weight: bold;
     }
-    .login-btn:hover {
-      opacity: 0.9;
-      transform: scale(1.05);
-    }
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    .footer {
-      margin-top: 2rem;
-      font-size: 0.8rem;
-      color: #888;
+    .error {
+      color: red;
+      margin-top: 1rem;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>YouTube Studio Panel</h1>
-    <button class="login-btn" onclick="loginWithGoogle()">Sign in with Google</button>
-    <div class="footer">Powered by Saju • OAuth 2.0</div>
-  </div>
+  <h1>📺 YouTube CMS Dashboard</h1>
+  <div id="content"></div>
+  <div id="error" class="error"></div>
 
   <script>
-    function loginWithGoogle() {
-      const clientId = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
-      const redirectUri = "https://saju-live.vercel.app/callback.html";
-      const scope = "https://www.googleapis.com/auth/youtube.force-ssl https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&prompt=consent&access_type=online`;
-      window.location.href = authUrl;
+    async function fetchVideos(accessToken) {
+      const res = await fetch("https://www.googleapis.com/youtube/v3/videos?part=snippet&mine=true&maxResults=10", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
+      const data = await res.json();
+      return data.items || [];
     }
+
+    async function setGeoRestriction(videoId, accessToken) {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          id: videoId,
+          contentDetails: {
+            regionRestriction: {
+              allowed: ["BD"]
+            }
+          }
+        })
+      });
+
+      if (res.ok) {
+        alert("✅ Geo restriction applied to Bangladesh!");
+      } else {
+        alert("❌ Failed to apply restriction.");
+      }
+    }
+
+    async function init() {
+      const accessToken = localStorage.getItem("access_token");
+      if (!accessToken) {
+        document.getElementById("error").textContent = "❌ Authentication failed: No token found.";
+        return;
+      }
+
+      try {
+        const videos = await fetchVideos(accessToken);
+        const content = document.getElementById("content");
+
+        if (videos.length === 0) {
+          content.innerHTML = "No videos found.";
+          return;
+        }
+
+        videos.forEach(video => {
+          const card = document.createElement("div");
+          card.className = "video-card";
+          card.innerHTML = `
+            <h2>${video.snippet.title}</h2>
+            <button class="restriction-btn" onclick="setGeoRestriction('${video.id}', '${accessToken}')">
+              Restrict to Bangladesh 🇧🇩
+            </button>
+          `;
+          content.appendChild(card);
+        });
+      } catch (err) {
+        document.getElementById("error").textContent = "❌ Authentication failed: Invalid token";
+      }
+    }
+
+    init();
   </script>
 </body>
 </html>
