@@ -3,48 +3,81 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube CMS</title>
+  <title>YouTube Studio Panel</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body {
-      background-color: #0f0f0f;
-      color: white;
-      font-family: 'Inter', sans-serif;
-      padding: 2rem;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
-    .error {
-      color: red;
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f0f0f;
+      color: white;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-image: linear-gradient(145deg, #111, #000);
+    }
+    .card {
+      background: #1c1c1c;
+      padding: 2.5rem;
+      border-radius: 14px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+      text-align: center;
+      width: 90%;
+      max-width: 360px;
+    }
+    .card h1 {
+      font-size: 1.6rem;
+      margin-bottom: 1.5rem;
+      color: #ffcc00;
+    }
+    .login-btn {
+      background: linear-gradient(-45deg, #ff4e50, #f9d423, #24c6dc, #5433ff);
+      background-size: 400% 400%;
+      color: #fff;
+      font-weight: bold;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      animation: gradientShift 6s ease infinite;
+    }
+    .login-btn:hover {
+      opacity: 0.9;
+      transform: scale(1.05);
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    .footer {
       margin-top: 2rem;
+      font-size: 0.8rem;
+      color: #888;
     }
   </style>
 </head>
 <body>
-  <h1>📺 YouTube CMS Dashboard</h1>
-  <div id="content">Loading user info...</div>
+  <div class="card">
+    <h1>YouTube Studio Panel</h1>
+    <button class="login-btn" onclick="loginWithGoogle()">Sign in with Google</button>
+    <div class="footer">Powered by Saju • OAuth 2.0</div>
+  </div>
 
   <script>
-    const token = localStorage.getItem("access_token");
-
-    if (!token) {
-      document.getElementById("content").innerHTML = `<p class="error">❌ Failed to authenticate. Please try again.</p>`;
-    } else {
-      fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      .then(res => {
-        if (!res.ok) throw new Error("Invalid token");
-        return res.json();
-      })
-      .then(data => {
-        document.getElementById("content").innerHTML = `
-          <p>✅ Logged in as: <strong>${data.name}</strong></p>
-          <p>Email: ${data.email}</p>
-        `;
-      })
-      .catch(err => {
-        document.getElementById("content").innerHTML = `<p class="error">❌ Authentication failed: ${err.message}</p>`;
-      });
+    function loginWithGoogle() {
+      const clientId = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
+      const redirectUri = "https://saju-live.vercel.app/callback.html";
+      const scope = "https://www.googleapis.com/auth/youtube.force-ssl https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&prompt=consent&access_type=online`;
+      window.location.href = authUrl;
     }
   </script>
 </body>
