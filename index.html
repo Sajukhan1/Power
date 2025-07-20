@@ -7,20 +7,28 @@
   <style>
     body {
       background-color: #0f0f0f;
-      color: white;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      height: 100vh;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
-      text-align: center;
     }
 
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 30px;
+    .login-container {
+      background-color: #1a1a1a;
+      padding: 40px 30px;
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.6);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      border: 1px solid #333;
+    }
+
+    .login-container h1 {
+      font-size: 1.8rem;
+      margin-bottom: 25px;
       background: linear-gradient(to right, #ff6ec4, #7873f5, #4ade80, #facc15, #f472b6);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -60,8 +68,10 @@
   </style>
 </head>
 <body>
-  <h1>Login to YouTube Studio Panel</h1>
-  <button class="login-btn" onclick="loginWithGoogle()">Login with Google</button>
+  <div class="login-container">
+    <h1>Login to YouTube Studio Panel</h1>
+    <button class="login-btn" onclick="loginWithGoogle()">Login with Google</button>
+  </div>
 
   <script>
     function loginWithGoogle() {
