@@ -1,90 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube Studio Login</title>
+  <meta charset="UTF-8">
+  <title>Login with YouTube</title>
   <style>
     body {
-      background-color: #0f0f0f;
-      margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #000;
+      color: #fff;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       height: 100vh;
     }
-
-    .container {
-      border: 4px solid;
-      border-radius: 16px;
-      padding: 40px 30px;
-      text-align: center;
-      animation: borderAnim 6s linear infinite;
-      background: rgba(255, 255, 255, 0.02);
-      backdrop-filter: blur(5px);
-    }
-
-    @keyframes borderAnim {
-      0% { border-image: linear-gradient(45deg, red, orange, yellow, green, cyan, blue, violet) 1; }
-      100% { border-image: linear-gradient(405deg, red, orange, yellow, green, cyan, blue, violet) 1; }
-    }
-
-    .title {
-      font-size: 28px;
-      font-weight: bold;
-      background: linear-gradient(90deg, #ff4d4d, #ffcc00, #00ffcc, #00ccff, #cc00ff);
-      background-size: 400% 400%;
+    h1 {
+      background: linear-gradient(to right, #00f260, #0575e6);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: textAnim 6s ease infinite;
-      margin-bottom: 30px;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      font-size: 36px;
+      margin-bottom: 20px;
     }
-
-    @keyframes textAnim {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-
     .login-btn {
+      background: linear-gradient(to right, #ff416c, #ff4b2b);
+      border: none;
       padding: 14px 28px;
       font-size: 18px;
-      font-weight: bold;
-      border: none;
       border-radius: 8px;
-      cursor: pointer;
       color: white;
-      background: linear-gradient(90deg, #6a5af9, #00f5a0);
-      box-shadow: 0 6px 16px rgba(0, 255, 170, 0.3);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+      transition: 0.3s ease;
     }
-
     .login-btn:hover {
       transform: scale(1.05);
-      box-shadow: 0 8px 20px rgba(0, 255, 170, 0.5);
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="title">Login to YouTube Studio Panel</div>
-    <button class="login-btn" onclick="loginWithGoogle()">Login with Google</button>
-  </div>
+  <h1>YouTube Rights Management</h1>
+  <button class="login-btn" onclick="login()">🎬 Login with Google</button>
 
   <script>
-    function loginWithGoogle() {
-      const clientId = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
-      const redirectUri = "https://saju-live.vercel.app/callback.html";
+    function login() {
+      const clientId = '85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com';
+      const redirectUri = 'https://saju-live.vercel.app/callback.html';
       const scope = [
-        "https://www.googleapis.com/auth/youtube.readonly",
-        "https://www.googleapis.com/auth/youtube.upload",
-        "https://www.googleapis.com/auth/youtube",
-        "https://www.googleapis.com/auth/youtube.force-ssl",
-        "https://www.googleapis.com/auth/youtube.channel-memberships.creator"
-      ].join(" ");
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${encodeURIComponent(scope)}&include_granted_scopes=true`;
+        'https://www.googleapis.com/auth/youtube',
+        'https://www.googleapis.com/auth/youtube.force-ssl',
+        'https://www.googleapis.com/auth/youtubepartner',
+        'https://www.googleapis.com/auth/youtubepartner-channel-audit'
+      ].join(' ');
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${encodeURIComponent(scope)}&include_granted_scopes=true`;
 
       window.location.href = authUrl;
     }
