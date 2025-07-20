@@ -1,96 +1,99 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>YouTube Studio CMS</title>
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-  <style>
-    body {
-      background-color: #0f0f0f;
-      color: white;
-      font-family: Arial, sans-serif;
-    }
-    .sidebar {
-      width: 240px;
-      background-color: #1f1f1f;
-      height: 100vh;
-    }
-    .sidebar a {
-      padding: 14px 20px;
-      display: block;
-      color: #ccc;
-      text-decoration: none;
-    }
-    .sidebar a:hover {
-      background-color: #333;
-      color: white;
-    }
-    .content {
-      margin-left: 240px;
-      padding: 20px;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YouTube CMS Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="icon" href="https://www.youtube.com/s/desktop/98f57ff4/img/favicon_32x32.png" />
 </head>
-<body>
-  <div class="flex">
-    <!-- Sidebar -->
-    <div class="sidebar fixed top-0 left-0">
-      <a href="#"><i class="fas fa-home mr-2"></i> Dashboard</a>
-      <a href="#"><i class="fas fa-video mr-2"></i> Content</a>
-      <a href="#"><i class="fas fa-chart-bar mr-2"></i> Analytics</a>
-      <a href="#"><i class="fas fa-comments mr-2"></i> Comments</a>
-      <a href="#"><i class="fas fa-dollar-sign mr-2"></i> Monetization</a>
-      <a href="#"><i class="fas fa-cog mr-2"></i> Settings</a>
-    </div><!-- Main Content -->
-<div class="content w-full">
-  <div class="flex justify-between items-center mb-4">
-    <h1 class="text-2xl font-bold">Channel dashboard</h1>
-    <div class="flex space-x-4">
-      <button class="bg-gray-700 px-4 py-2 rounded">Create</button>
-      <img src="https://www.gstatic.com/youtube/img/creator/no_photo.png" alt="Avatar" class="w-8 h-8 rounded-full">
-    </div>
-  </div>
+<body class="bg-gray-900 text-white font-sans">
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-    <div class="bg-gray-800 p-4 rounded shadow">
-      <h2 class="text-lg font-semibold mb-2">Latest YouTube Short performance</h2>
-      <div class="bg-gray-900 p-2 rounded mb-2">🎉😂🤣 #freefire</div>
-      <p>Views: 623</p>
-      <p>Likes: 7</p>
+  <!-- Header -->
+  <header class="flex items-center justify-between px-6 py-4 bg-gray-800 shadow-md">
+    <div class="flex items-center space-x-2">
+      <img src="https://www.youtube.com/s/desktop/98f57ff4/img/favicon_32x32.png" class="w-6 h-6" alt="YouTube" />
+      <h1 class="text-xl font-semibold">Studio Dashboard</h1>
     </div>
+    <div class="text-sm text-gray-300">📅 <span id="date"></span></div>
+  </header>
 
-    <div class="bg-gray-800 p-4 rounded shadow">
-      <h2 class="text-lg font-semibold mb-2">Important notifications</h2>
-      <p>Your video is blocked in some territories due to...</p>
-      <button class="mt-2 bg-blue-600 px-3 py-1 rounded">View options</button>
-    </div>
+  <!-- Dashboard Grid -->
+  <main class="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
 
-    <div class="bg-gray-800 p-4 rounded shadow">
-      <h2 class="text-lg font-semibold mb-2">Channel analytics</h2>
-      <p>Views (28 days): 740</p>
-      <p>Watch time: 1.0 hours</p>
-      <p>Top video: Phulki 16 July 2025</p>
-    </div>
+    <!-- Latest YouTube Short -->
+    <section class="bg-gray-800 rounded-xl shadow p-4 col-span-1">
+      <h2 class="text-lg font-bold mb-2">Latest YouTube Short performance</h2>
+      <img src="https://img.youtube.com/vi/5To0cZTC-rU/hqdefault.jpg" alt="Video Thumbnail" class="rounded mb-2">
+      <p class="text-sm text-gray-400">623 views • 95.8% avg viewed • 7 likes</p>
+    </section>
 
-    <div class="bg-gray-800 p-4 rounded shadow col-span-2">
-      <h2 class="text-lg font-semibold mb-2">Published videos</h2>
-      <ul class="space-y-2">
-        <li>🤣🤣🤣🤣 | Views: 17 | Likes: 0</li>
-        <li>না দেখতে বিশ্বাস হবে না | Views: 6</li>
-        <li>😂😂😂 | Views: 0</li>
-        <li>দেখে নাও 🤣 | Views: 2</li>
+    <!-- Important Notifications -->
+    <section class="bg-gray-800 rounded-xl shadow p-4 col-span-1">
+      <h2 class="text-lg font-bold mb-2">Important notifications</h2>
+      <div class="text-sm bg-red-500 bg-opacity-20 p-2 rounded">
+        🚫 Video <strong>Phulki 16 July 2025</strong> is blocked in some territories.
+        <button class="mt-2 text-blue-400 underline text-xs">View options</button>
+      </div>
+    </section>
+
+    <!-- Channel Analytics -->
+    <section class="bg-gray-800 rounded-xl shadow p-4 col-span-1">
+      <h2 class="text-lg font-bold mb-2">Channel analytics</h2>
+      <p class="text-sm mb-1">📈 Views: <strong>740</strong></p>
+      <p class="text-sm mb-1">⏱ Watch Time: <strong>1.0 hrs</strong></p>
+      <p class="text-sm">🎯 Top Video: <strong>Phulki 16 July 2025</strong></p>
+    </section>
+
+    <!-- Published Videos -->
+    <section class="bg-gray-800 rounded-xl shadow p-4 col-span-2">
+      <h2 class="text-lg font-bold mb-2">Published videos</h2>
+      <ul class="space-y-2 text-sm">
+        <li class="flex justify-between border-b border-gray-700 pb-1">
+          <span>😂🤣😆 #freefire #funnyvideo</span><span>📊 17 views</span>
+        </li>
+        <li class="flex justify-between border-b border-gray-700 pb-1">
+          <span>না দেখলে মিস করবেন 😂</span><span>📊 14 views</span>
+        </li>
+        <li class="flex justify-between border-b border-gray-700 pb-1">
+          <span>🤣😜😝 #music #phone</span><span>📊 8 views</span>
+        </li>
+        <li class="flex justify-between">
+          <span>দেখে নাও এখনই!!🔥</span><span>📊 2 views</span>
+        </li>
       </ul>
-    </div>
+    </section>
 
-    <div class="bg-gray-800 p-4 rounded shadow">
-      <h2 class="text-lg font-semibold mb-2">News</h2>
-      <p>Creator Roundup: VidCon Edition</p>
-      <button class="mt-2 bg-blue-600 px-3 py-1 rounded">Check it out</button>
-    </div>
-  </div>
-</div>
+    <!-- News & Updates -->
+    <section class="bg-gray-800 rounded-xl shadow p-4">
+      <h2 class="text-lg font-bold mb-2">News</h2>
+      <p class="text-sm mb-1">📢 RoundUp at VidCon 2025</p>
+      <a href="#" class="text-blue-400 underline text-xs">Check it out</a>
+    </section>
 
-  </div>
+    <!-- Creator Insider -->
+    <section class="bg-gray-800 rounded-xl shadow p-4">
+      <h2 class="text-lg font-bold mb-2">Creator Insider</h2>
+      <p class="text-sm">New rules, badges, monetization updates.</p>
+      <a href="#" class="text-blue-400 underline text-xs">Watch on YouTube</a>
+    </section>
+
+    <!-- What's New -->
+    <section class="bg-gray-800 rounded-xl shadow p-4 col-span-1">
+      <h2 class="text-lg font-bold mb-2">What's new in Studio</h2>
+      <ul class="text-sm list-disc list-inside text-gray-400 space-y-1">
+        <li>Increasing Shorts length</li>
+        <li>Expansion of channel permissions</li>
+        <li>Community Guidelines update</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <script>
+    // Show today's date
+    document.getElementById('date').textContent = new Date().toLocaleDateString();
+  </script>
+
 </body>
 </html>
