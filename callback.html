@@ -1,45 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Authenticating...</title>
+  <meta charset="UTF-8" />
+  <title>Redirecting...</title>
   <style>
     body {
-      font-family: 'Roboto', sans-serif;
-      background-color: #121212;
+      background: #000;
       color: white;
+      font-family: sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
-    .loader {
-      text-align: center;
-    }
-    .loader p {
-      font-size: 1.2rem;
-      margin-top: 1rem;
+
+    h2 {
+      color: #ccc;
     }
   </style>
 </head>
 <body>
-  <div class="loader">
-    <div class="spinner"></div>
-    <p>Authenticating with YouTube. Please wait...</p>
-  </div>
+  <h2>Logging in... Please wait</h2>
 
   <script>
-    // Extract access token from URL fragment
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const accessToken = hashParams.get('access_token');
+    const hashParams = new URLSearchParams(window.location.hash.slice(1));
+    const accessToken = hashParams.get("access_token");
 
     if (accessToken) {
-      // Store token in localStorage
-      localStorage.setItem('yt_access_token', accessToken);
-      // Redirect to CMS dashboard
-      window.location.href = 'cms.html';
+      localStorage.setItem("yt_access_token", accessToken);
+      window.location.href = "cms.html";
     } else {
-      document.body.innerHTML = "<h2 style='color:red'>Error: Access Token not found!</h2>";
+      document.body.innerHTML = "<h2>❌ Failed to retrieve access token</h2>";
     }
   </script>
 </body>
