@@ -1,66 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>YouTube Rights Management Dashboard</title>
+  <meta charset="UTF-8" />
+  <title>YouTube Rights Management CMS</title>
   <style>
     body {
       background: #0f0f0f;
       color: white;
-      font-family: Arial, sans-serif;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
       padding: 20px;
     }
-    h1 {
-      font-size: 28px;
-      color: #00e5ff;
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       margin-bottom: 30px;
     }
-    .video {
-      background: #1f1f1f;
-      border-radius: 10px;
-      padding: 15px;
-      margin-bottom: 15px;
-      box-shadow: 0 0 5px #03a9f4;
+
+    h1 {
+      font-size: 26px;
+      color: #00e5ff;
     }
-    .video-title {
-      font-size: 18px;
-      font-weight: bold;
-    }
-    iframe {
-      width: 100%;
-      height: 200px<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>YouTube Rights Management Dashboard</title>
-  <style>
-    body {
-      background: #0f0f0f;
+
+    .logout-btn {
+      background-color: #ff1744;
+      border: none;
       color: white;
-      font-family: Arial, sans-serif;
-      padding: 20px;
+      padding: 10px 20px;
+      border-radius: 8px;
+      cursor: pointer;
     }
-    h1 {
-      font-size: 28px;
-      color: #00e5ff;
-      margin-bottom: 30px;
+
+    .video-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 20px;
     }
-    .video {
-      background: #1f1f1f;
-      border-radius: 10px;
+
+    .video-card {
+      background-color: #1f1f1f;
+      border-radius: 12px;
       padding: 15px;
-      margin-bottom: 15px;
       box-shadow: 0 0 5px #03a9f4;
     }
-    .video-title {
-      font-size: 18px;
-      font-weight: bold;
-    }
-    iframe {
+
+    .video-card iframe {
       width: 100%;
       height: 200px;
       border-radius: 8px;
     }
+
+    .video-title {
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 10px;
+      margin-bottom: 5px;
+    }
+
+    .status {
+      font-size: 14px;
+      color: #ccc;
+      margin-bottom: 8px;
+    }
+
     .btn {
       background: #03a9f4;
       color: black;
@@ -69,23 +73,46 @@
       border-radius: 6px;
       cursor: pointer;
       font-weight: bold;
-      margin-top: 10px;
+      margin-right: 8px;
     }
-    .status {
-      margin-top: 5px;
-      font-size: 14px;
-      color: #ccc;
+
+    .asset-input {
+      width: 100%;
+      margin-top: 10px;
+      padding: 6px;
+      border-radius: 5px;
+      border: none;
+      background: #2c2c2c;
+      color: white;
+    }
+
+    .footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 13px;
+      color: #666;
     }
   </style>
 </head>
 <body>
-  <h1>🛡️ YouTube Rights Management Dashboard</h1>
-  <div id="video-list">Loading videos...</div>
+  <header>
+    <h1>🛡️ YouTube Rights Management Studio</h1>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </header>
+
+  <div id="video-list" class="video-list">Loading videos...</div>
+
+  <div class="footer">© 2025 YouTube Studio Clone by Saju Khan</div>
 
   <script>
-    async function fetchVideos() {
-      const accessToken = localStorage.getItem("access_token");
+    const accessToken = localStorage.getItem("yt_access_token");
 
+    function logout() {
+      localStorage.removeItem("yt_access_token");
+      window.location.href = "index.html";
+    }
+
+    async function fetchVideos() {
       if (!accessToken) {
         document.getElementById("video-list").innerText = "❌ Access token not found.";
         return;
@@ -109,32 +136,38 @@
         videos.items.forEach(video => {
           const vidId = video.snippet.resourceId.videoId;
           const title = video.snippet.title;
+          const assetKey = `asset_${vidId}`;
+          const storedAsset = localStorage.getItem(assetKey) || "";
 
           const div = document.createElement("div");
-          div.className = "video";
+          div.className = "video-card";
           div.innerHTML = `
-            <div class="video-title">${title}</div>
             <iframe src="https://www.youtube.com/embed/${vidId}" allowfullscreen></iframe>
-            <button class="btn" onclick="restrictVideo('${vidId}', this)">Apply BD Restriction</button>
-            <div class="status" id="status-${vidId}">Ready</div>
+            <div class="video-title">${title}</div>
+            <div class="status" id="status-${vidId}">✅ Ready</div>
+            <input type="text" class="asset-input" placeholder="Enter Asset Info..." value="${storedAsset}" oninput="saveAsset('${vidId}', this.value)">
+            <br />
+            <button class="btn" onclick="applyBDRestriction('${vidId}', this)">Restrict to BD</button>
           `;
           list.appendChild(div);
         });
 
       } catch (err) {
         console.error(err);
-        document.getElementById("video-list").innerText = "❌ Error loading videos.";
+        document.getElementById("video-list").innerText = "❌ Failed to load videos.";
       }
     }
 
-    async function restrictVideo(videoId, btn) {
-      const accessToken = localStorage.getItem("access_token");
+    function saveAsset(videoId, value) {
+      localStorage.setItem(`asset_${videoId}`, value);
+    }
 
+    async function applyBDRestriction(videoId, btn) {
       btn.disabled = true;
-      btn.innerText = "Restricting...";
+      btn.innerText = "Applying...";
 
       try {
-        const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails`, {
+        const response = await fetch("https://www.googleapis.com/youtube/v3/videos?part=contentDetails", {
           method: "PUT",
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -150,19 +183,18 @@
           })
         });
 
-        if (res.ok) {
-          document.getElementById(`status-${videoId}`).innerText = "✅ Restricted to Bangladesh";
+        if (response.ok) {
+          document.getElementById(`status-${videoId}`).innerText = "🌍 Geo-Restricted to BD ✅";
         } else {
-          document.getElementById(`status-${videoId}`).innerText = "❌ Failed to apply restriction";
+          document.getElementById(`status-${videoId}`).innerText = "❌ Restriction failed";
         }
-
-      } catch (e) {
-        console.error(e);
-        document.getElementById(`status-${videoId}`).innerText = "❌ Error during request";
+      } catch (err) {
+        console.error(err);
+        document.getElementById(`status-${videoId}`).innerText = "❌ Error during restriction";
       }
 
       btn.disabled = false;
-      btn.innerText = "Apply BD Restriction";
+      btn.innerText = "Restrict to BD";
     }
 
     fetchVideos();
