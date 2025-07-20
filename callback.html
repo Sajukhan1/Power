@@ -2,35 +2,115 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Redirecting...</title>
+  <title>YouTube CMS Dashboard</title>
   <style>
     body {
-      background: #000;
+      background: #0f0f0f;
       color: white;
-      font-family: sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
     }
 
-    h2 {
+    h1 {
+      color: #ff0000;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .video-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .video-card {
+      background: #1f1f1f;
+      padding: 20px;
+      border-radius: 10px;
+      display: flex;
+      gap: 15px;
+      align-items: flex-start;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+    }
+
+    .video-card img {
+      width: 160px;
+      border-radius: 6px;
+    }
+
+    .video-info {
+      flex-grow: 1;
+    }
+
+    .video-info h2 {
+      margin: 0;
+      font-size: 18px;
+      color: #fff;
+    }
+
+    .video-info p {
+      margin: 8px 0;
       color: #ccc;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <h2>Logging in... Please wait</h2>
+  <h1>📺 YouTube Studio Dashboard</h1>
+  <div id="videoList" class="video-list">Loading your videos...</div>
 
   <script>
-    const hashParams = new URLSearchParams(window.location.hash.slice(1));
-    const accessToken = hashParams.get("access_token");
+    const accessToken = localStorage.getItem("yt_access_token");
+    const videoList = document.getElementById("videoList");
 
-    if (accessToken) {
-      localStorage.setItem("yt_access_token", accessToken);
-      window.location.href = "cms.html";
+    if (!accessToken) {
+      videoList.innerHTML = "<p>❌ Access token not found. Please log in again.</p>";
     } else {
-      document.body.innerHTML = "<h2>❌ Failed to retrieve access token</h2>";
+      fetch("https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true", {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      })
+      .then(res => res.json())
+      .then(data => {
+        const uploadsPlaylistId = data.items[0].contentDetails.relatedPlaylists.uploads;
+        return fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=10&playlistId=${uploadsPlaylistId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
+      })
+      .then(res => res.json())
+      .then(data => {
+        videoList.innerHTML = "";
+        const videoIds = data.items.map(item => item.contentDetails.videoId).join(",");
+
+        // Fetch stats (views, likes, comments)
+        fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${videoIds}`, {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        })
+        .then(res => res.json())
+        .then(statsData => {
+          data.items.forEach((item, index) => {
+            const stats = statsData.items[index].statistics;
+            const video = item.snippet;
+            const videoCard = document.createElement("div");
+            videoCard.className = "video-card";
+            videoCard.innerHTML = `
+              <img src="${video.thumbnails.medium.url}" alt="Thumbnail" />
+              <div class="video-info">
+                <h2>${video.title}</h2>
+                <p>Views: ${stats.viewCount || 0} | Likes: ${stats.likeCount || 0} | Comments: ${stats.commentCount || 0}</p>
+                <p>Published: ${new Date(video.publishedAt).toLocaleString()}</p>
+              </div>
+            `;
+            videoList.appendChild(videoCard);
+          });
+        });
+      })
+      .catch(err => {
+        videoList.innerHTML = `<p>❌ Error fetching videos: ${err.message}</p>`;
+        console.error(err);
+      });
     }
   </script>
 </body>
