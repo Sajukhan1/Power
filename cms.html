@@ -1,104 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube CMS</title>
+  <meta charset="UTF-8">
+  <title>YouTube CMS Dashboard</title>
   <style>
     body {
-      background: #0f0f0f;
+      background-color: #0f0f0f;
       color: white;
-      font-family: 'Inter', sans-serif;
+      font-family: Arial, sans-serif;
       padding: 20px;
     }
     h1 {
-      color: #00acee;
+      color: #03A9F4;
     }
-    .video-card {
-      border: 1px solid #333;
-      border-radius: 10px;
-      padding: 15px;
-      margin: 10px 0;
+    .video {
       background: #1e1e1e;
+      padding: 15px;
+      margin-bottom: 10px;
+      border-radius: 8px;
     }
-    button {
-      background-color: #1e88e5;
-      color: white;
-      padding: 8px 12px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
+    .video-title {
+      font-size: 18px;
+      margin-bottom: 5px;
     }
-    button:hover {
-      background-color: #1565c0;
+    iframe {
+      max-width: 100%;
     }
   </style>
 </head>
 <body>
   <h1>YouTube CMS Dashboard</h1>
-  <div id="video-list">Loading videos...</div>
+  <div id="video-list">Loading your videos...</div>
 
   <script>
-    const accessToken = localStorage.getItem("access_token");
+    async function fetchMyVideos() {
+      const accessToken = localStorage.getItem("access_token");
 
-    async function fetchVideos() {
-      const res = await fetch("https://www.googleapis.com/youtube/v3/videos?part=snippet&mine=true&maxResults=10", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        }
-      });
-      const data = await res.json();
-
-      if (!data.items || data.items.length === 0) {
-        document.getElementById("video-list").innerText = "❌ No videos found.";
+      if (!accessToken) {
+        document.getElementById("video-list").innerHTML = "❌ Access token missing.";
         return;
       }
 
-      const list = document.getElementById("video-list");
-      list.innerHTML = "";
-
-      data.items.forEach(video => {
-        const card = document.createElement("div");
-        card.className = "video-card";
-        card.innerHTML = `
-          <h3>${video.snippet.title}</h3>
-          <p>${video.snippet.description}</p>
-          <button onclick="restrictVideo('${video.id}')">Restrict to Bangladesh</button>
-        `;
-        list.appendChild(card);
-      });
-    }
-
-    async function restrictVideo(videoId) {
-      const body = {
-        id: videoId,
-        snippet: {},
-        status: {
-          privacyStatus: "public",
-          regionRestriction: {
-            allowed: ["BD"]
+      try {
+        // Get Channel's Uploads Playlist
+        const channelResp = await fetch(`https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
           }
+        });
+        const channelData = await channelResp.json();
+        const uploadsPlaylistId = channelData.items[0].contentDetails.relatedPlaylists.uploads;
+
+        // Fetch videos from that playlist
+        const videosResp = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=10&playlistId=${uploadsPlaylistId}`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
+        const videosData = await videosResp.json();
+
+        if (!videosData.items || videosData.items.length === 0) {
+          document.getElementById("video-list").innerHTML = "❌ No videos found.";
+          return;
         }
-      };
 
-      const res = await fetch("https://www.googleapis.com/youtube/v3/videos?part=status", {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(body)
-      });
+        const container = document.getElementById("video-list");
+        container.innerHTML = "";
 
-      if (res.ok) {
-        alert(`✅ Video ${videoId} restricted to Bangladesh.`);
-      } else {
-        const err = await res.json();
-        alert("❌ Failed: " + (err.error?.message || "Unknown error"));
+        videosData.items.forEach(item => {
+          const videoId = item.snippet.resourceId.videoId;
+          const title = item.snippet.title;
+
+          const div = document.createElement("div");
+          div.className = "video";
+          div.innerHTML = `
+            <div class="video-title">${title}</div>
+            <iframe width="100%" height="200" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
+          `;
+          container.appendChild(div);
+        });
+
+      } catch (error) {
+        console.error(error);
+        document.getElementById("video-list").innerHTML = "❌ Error loading videos.";
       }
     }
 
-    fetchVideos();
+    fetchMyVideos();
   </script>
 </body>
 </html>
