@@ -3,85 +3,73 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login to YouTube Studio Panel</title>
+  <title>YouTube Studio Login</title>
   <style>
     body {
       background-color: #0f0f0f;
-      color: white;
+      margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      margin: 0;
     }
 
-    .login-container {
-      padding: 40px;
-      border-radius: 20px;
-      text-align: center;
-      background: #111;
+    .container {
       border: 4px solid;
-      border-image: linear-gradient(45deg, #ff6ec4, #7873f5, #4ade80, #facc15, #f472b6) 1;
-      animation: borderAnimation 5s linear infinite;
+      border-radius: 16px;
+      padding: 40px 30px;
+      text-align: center;
+      animation: borderAnim 6s linear infinite;
+      background: rgba(255, 255, 255, 0.02);
+      backdrop-filter: blur(5px);
     }
 
-    @keyframes borderAnimation {
-      0% {
-        border-image-source: linear-gradient(45deg, #ff6ec4, #7873f5, #4ade80, #facc15, #f472b6);
-      }
-      50% {
-        border-image-source: linear-gradient(45deg, #f472b6, #facc15, #4ade80, #7873f5, #ff6ec4);
-      }
-      100% {
-        border-image-source: linear-gradient(45deg, #ff6ec4, #7873f5, #4ade80, #facc15, #f472b6);
-      }
+    @keyframes borderAnim {
+      0% { border-image: linear-gradient(45deg, red, orange, yellow, green, cyan, blue, violet) 1; }
+      100% { border-image: linear-gradient(405deg, red, orange, yellow, green, cyan, blue, violet) 1; }
     }
 
-    .login-container h1 {
-      font-size: 2rem;
-      margin-bottom: 30px;
-      background: linear-gradient(to right, #ff6ec4, #7873f5, #4ade80, #facc15, #f472b6);
+    .title {
+      font-size: 28px;
+      font-weight: bold;
+      background: linear-gradient(90deg, #ff4d4d, #ffcc00, #00ffcc, #00ccff, #cc00ff);
+      background-size: 400% 400%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      animation: textSlide 8s linear infinite;
+      animation: textAnim 6s ease infinite;
+      margin-bottom: 30px;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.4);
     }
 
-    @keyframes textSlide {
-      0% { background-position: 0% 50%; }
-      100% { background-position: 100% 50%; }
-    }
-
-    .login-btn {
-      padding: 14px 32px;
-      font-size: 18px;
-      font-weight: bold;
-      background: linear-gradient(45deg, #ff6ec4, #7873f5, #4ade80, #facc15, #f472b6);
-      background-size: 300% 300%;
-      color: white;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
-      transition: all 0.4s ease;
-      animation: rainbow 5s ease infinite;
-    }
-
-    .login-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 24px rgba(255, 255, 255, 0.2);
-    }
-
-    @keyframes rainbow {
+    @keyframes textAnim {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
+
+    .login-btn {
+      padding: 14px 28px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+      background: linear-gradient(90deg, #6a5af9, #00f5a0);
+      box-shadow: 0 6px 16px rgba(0, 255, 170, 0.3);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .login-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 8px 20px rgba(0, 255, 170, 0.5);
+    }
   </style>
 </head>
 <body>
-  <div class="login-container">
-    <h1>Login to YouTube Studio Panel</h1>
+  <div class="container">
+    <div class="title">Login to YouTube Studio Panel</div>
     <button class="login-btn" onclick="loginWithGoogle()">Login with Google</button>
   </div>
 
