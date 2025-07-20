@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login with Google</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 320px;
+    }
+    h2 {
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+    button {
+      background: #4285F4;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    .user-info {
+      margin-top: 1.5rem;
+    }
+    .user-info img {
+      border-radius: 50%;
+      width: 64px;
+      height: 64px;
+      margin-bottom: 0.5rem;
+    }
+    .user-info h3 {
+      margin: 0;
+      color: #222;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Login with Google</h2>
+    <button onclick="loginWithGoogle()">Sign in with Google</button>
+    <div class="user-info" id="userInfo" style="display: none;">
+      <img id="userImage" />
+      <h3 id="userName"></h3>
+    </div>
+  </div>
+
+  <script>
+    function loginWithGoogle() {
+      const clientId = "YOUR_CLIENT_ID_HERE"; // <-- replace with real client ID
+      const redirectUri = window.location.origin + "/callback.html";
+      const scope = "https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email";
+
+      const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&prompt=select_account`;
+
+      window.location.href = url;
+    }
+  </script>
+</body>
+</html>
