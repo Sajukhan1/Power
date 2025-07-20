@@ -4,17 +4,18 @@
   <meta charset="UTF-8">
   <title>Redirecting...</title>
 </head>
-<body style="background:#000;color:white;font-family:sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;">
-  <h2>🔐 Logging in, please wait...</h2>
+<body style="background:#000;color:#fff;text-align:center;font-family:sans-serif;">
+  <h2>🔐 Authenticating with YouTube...</h2>
   <script>
     const hash = window.location.hash.substr(1);
     const params = new URLSearchParams(hash);
     const accessToken = params.get("access_token");
+
     if (accessToken) {
       localStorage.setItem("access_token", accessToken);
-      window.location.href = "cms.html";
+      window.location.href = "/cms.html";
     } else {
-      document.body.innerHTML = "<h2>❌ Access token not found.</h2>";
+      document.body.innerHTML = "<h2>❌ Failed to authenticate.</h2>";
     }
   </script>
 </body>
