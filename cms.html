@@ -1,185 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>YouTube Rights Management</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <title>Rights Management Dashboard</title>
   <style>
     body {
-      background-color: #f9f9f9;
-      font-family: Roboto, sans-serif;
       margin: 0;
       padding: 0;
+      background-color: #121212;
+      color: #fff;
+      font-family: 'Roboto', sans-serif;
     }
 
-    .container {
-      width: 800px;
-      margin: 30px auto;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      padding: 30px;
+    header {
+      padding: 20px;
+      font-size: 28px;
+      font-weight: bold;
+      border-bottom: 1px solid #333;
     }
 
-    h2 {
-      color: #0f0f0f;
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 20px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      background-color: #1f1f1f;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .tab.active, .tab:hover {
+      background-color: #3ea6ff;
+    }
+
+    .panel {
+      display: none;
+      padding: 20px;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .form-group {
       margin-bottom: 20px;
     }
 
-    .label {
-      font-weight: 500;
-      margin: 20px 0 5px;
+    label {
       display: block;
-      color: #202124;
+      margin-bottom: 6px;
+      font-weight: 500;
     }
 
-    select, textarea, input[type="radio"] {
-      font-size: 16px;
-    }
-
-    select, textarea {
+    input[type="text"], select, textarea {
       width: 100%;
       padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      margin-bottom: 20px;
+      background-color: #1f1f1f;
+      border: 1px solid #444;
+      color: white;
+      border-radius: 4px;
     }
 
-    .radio-group {
-      margin: 10px 0 20px;
-    }
-
-    .radio-group label {
-      margin-right: 20px;
-      font-size: 16px;
-    }
-
-    .footer {
+    .buttons {
+      margin-top: 20px;
       display: flex;
       justify-content: space-between;
-      margin-top: 30px;
     }
 
     .btn {
+      background-color: #3ea6ff;
+      color: #fff;
       padding: 10px 20px;
-      background-color: #065fd4;
       border: none;
-      color: white;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
-    .btn:hover {
-      background-color: #0b55c3;
-    }
-
-    .policy-preview {
-      background: #f1f3f4;
-      padding: 15px;
       border-radius: 6px;
-      font-size: 14px;
-      color: #333;
+      cursor: pointer;
     }
 
-    .step-indicator {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 20px;
-    }
-
-    .step {
-      flex: 1;
-      text-align: center;
-      color: #aaa;
-      font-weight: 500;
-      position: relative;
-    }
-
-    .step.active {
-      color: #065fd4;
-    }
-
-    .step::after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 10px;
-      height: 10px;
-      background-color: currentColor;
-      border-radius: 50%;
+    .btn:disabled {
+      background-color: #555;
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="step-indicator">
-    <div class="step">Details</div>
-    <div class="step active">Rights man..</div>
-    <div class="step">Monetization</div>
-    <div class="step">Ad suitability</div>
-    <div class="step">Video elements</div>
-    <div class="step">Checks</div>
-    <div class="step">Visibility</div>
+<header>Rights Management</header>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab(0)">Details</button>
+  <button class="tab" onclick="switchTab(1)">Rights man..</button>
+  <button class="tab" onclick="switchTab(2)">Monetization</button>
+  <button class="tab" onclick="switchTab(3)">Ad suitability</button>
+  <button class="tab" onclick="switchTab(4)">Video elements</button>
+  <button class="tab" onclick="switchTab(5)">Checks</button>
+  <button class="tab" onclick="switchTab(6)">Visibility</button>
+</div>
+
+<!-- Details Panel -->
+<div class="panel active">
+  <div class="form-group">
+    <label>Video Title</label>
+    <input type="text" placeholder="Enter video title">
   </div>
-
-  <h2>Rights management</h2>
-
-  <label class="label" for="policy">Policies applied to your own video</label>
-  <select id="policy">
-    <option value="monetize_all">Monetize in all countries</option>
-    <option value="block_all">Block in all countries</option>
-    <option value="track_all">Track in all countries</option>
-  </select>
-
-  <div class="policy-preview">
-    <p><strong>Current policy:</strong> <span id="policyPreview">Monetize it</span></p>
-    <p>📍 Worldwide</p>
-  </div>
-
-  <label class="label">Ownership</label>
-  <div class="radio-group">
-    <label><input type="radio" name="ownership" value="global" checked /> Global</label>
-    <label><input type="radio" name="ownership" value="specific" /> Specific territories</label>
-  </div>
-
-  <label class="label" for="assetInfo">Asset information</label>
-  <textarea id="assetInfo" rows="3" placeholder="Add notes or metadata about the asset..."></textarea>
-
-  <div class="footer">
-    <button class="btn" onclick="alert('Going back...')">BACK</button>
-    <button class="btn" onclick="saveSettings()">NEXT</button>
+  <div class="form-group">
+    <label>Description</label>
+    <textarea placeholder="Enter video description"></textarea>
   </div>
 </div>
 
+<!-- Rights Management Panel -->
+<div class="panel">
+  <div class="form-group">
+    <label>Upload Policy</label>
+    <select>
+      <option>Monetize in all countries</option>
+      <option>Block in some countries</option>
+      <option>Track views only</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label>Ownership</label>
+    <input type="radio" name="ownership" checked> Global
+    <input type="radio" name="ownership"> Specific Territories
+  </div>
+
+  <div class="form-group">
+    <label>Asset Information</label>
+    <input type="text" placeholder="Custom Asset ID / Notes">
+  </div>
+
+  <div class="form-group">
+    <label>Policy Preview</label>
+    <p style="color: #ccc">Current policy: Monetize | Worldwide</p>
+  </div>
+</div>
+
+<!-- Other Empty Tabs -->
+<div class="panel"><p>Coming soon: Monetization settings.</p></div>
+<div class="panel"><p>Coming soon: Ad suitability checks.</p></div>
+<div class="panel"><p>Coming soon: Add video elements like cards, end screens.</p></div>
+<div class="panel"><p>Coming soon: Checks results will appear here.</p></div>
+<div class="panel"><p>Coming soon: Visibility and scheduling options.</p></div>
+
+<div class="buttons">
+  <button class="btn" onclick="prevTab()">Back</button>
+  <button class="btn" onclick="nextTab()">Next</button>
+</div>
+
 <script>
-  const policySelect = document.getElementById("policy");
-  const preview = document.getElementById("policyPreview");
+  let currentTab = 0;
+  const panels = document.querySelectorAll(".panel");
+  const tabs = document.querySelectorAll(".tab");
 
-  policySelect.addEventListener("change", () => {
-    const val = policySelect.value;
-    let text = "";
-    if (val === "monetize_all") text = "Monetize it";
-    else if (val === "block_all") text = "Block it";
-    else if (val === "track_all") text = "Track it";
-    preview.textContent = text;
-  });
+  function switchTab(index) {
+    tabs[currentTab].classList.remove("active");
+    panels[currentTab].classList.remove("active");
 
-  function saveSettings() {
-    const policy = document.getElementById('policy').value;
-    const ownership = document.querySelector('input[name="ownership"]:checked').value;
-    const assetInfo = document.getElementById('assetInfo').value;
+    currentTab = index;
 
-    const data = {
-      uploadPolicy: policy,
-      ownership: ownership,
-      assetInformation: assetInfo
-    };
+    tabs[currentTab].classList.add("active");
+    panels[currentTab].classList.add("active");
+  }
 
-    alert("✅ Settings saved:\n" + JSON.stringify(data, null, 2));
+  function nextTab() {
+    if (currentTab < tabs.length - 1) {
+      switchTab(currentTab + 1);
+    }
+  }
+
+  function prevTab() {
+    if (currentTab > 0) {
+      switchTab(currentTab - 1);
+    }
   }
 </script>
 
