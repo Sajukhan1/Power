@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>YouTube CMS Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="icon" href="https://www.youtube.com/s/desktop/98f57ff4/img/favicon_32x32.png" />
 </head>
 <body class="bg-gray-900 text-white font-sans">
 
@@ -18,82 +17,111 @@
     <div class="text-sm text-gray-300">📅 <span id="date"></span></div>
   </header>
 
-  <!-- Dashboard Grid -->
-  <main class="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-
-    <!-- Latest YouTube Short -->
-    <section class="bg-gray-800 rounded-xl shadow p-4 col-span-1">
-      <h2 class="text-lg font-bold mb-2">Latest YouTube Short performance</h2>
-      <img src="https://img.youtube.com/vi/5To0cZTC-rU/hqdefault.jpg" alt="Video Thumbnail" class="rounded mb-2">
-      <p class="text-sm text-gray-400">623 views • 95.8% avg viewed • 7 likes</p>
-    </section>
-
-    <!-- Important Notifications -->
-    <section class="bg-gray-800 rounded-xl shadow p-4 col-span-1">
-      <h2 class="text-lg font-bold mb-2">Important notifications</h2>
-      <div class="text-sm bg-red-500 bg-opacity-20 p-2 rounded">
-        🚫 Video <strong>Phulki 16 July 2025</strong> is blocked in some territories.
-        <button class="mt-2 text-blue-400 underline text-xs">View options</button>
-      </div>
-    </section>
-
-    <!-- Channel Analytics -->
-    <section class="bg-gray-800 rounded-xl shadow p-4 col-span-1">
-      <h2 class="text-lg font-bold mb-2">Channel analytics</h2>
-      <p class="text-sm mb-1">📈 Views: <strong>740</strong></p>
-      <p class="text-sm mb-1">⏱ Watch Time: <strong>1.0 hrs</strong></p>
-      <p class="text-sm">🎯 Top Video: <strong>Phulki 16 July 2025</strong></p>
-    </section>
-
-    <!-- Published Videos -->
-    <section class="bg-gray-800 rounded-xl shadow p-4 col-span-2">
-      <h2 class="text-lg font-bold mb-2">Published videos</h2>
-      <ul class="space-y-2 text-sm">
-        <li class="flex justify-between border-b border-gray-700 pb-1">
-          <span>😂🤣😆 #freefire #funnyvideo</span><span>📊 17 views</span>
-        </li>
-        <li class="flex justify-between border-b border-gray-700 pb-1">
-          <span>না দেখলে মিস করবেন 😂</span><span>📊 14 views</span>
-        </li>
-        <li class="flex justify-between border-b border-gray-700 pb-1">
-          <span>🤣😜😝 #music #phone</span><span>📊 8 views</span>
-        </li>
-        <li class="flex justify-between">
-          <span>দেখে নাও এখনই!!🔥</span><span>📊 2 views</span>
-        </li>
-      </ul>
-    </section>
-
-    <!-- News & Updates -->
-    <section class="bg-gray-800 rounded-xl shadow p-4">
-      <h2 class="text-lg font-bold mb-2">News</h2>
-      <p class="text-sm mb-1">📢 RoundUp at VidCon 2025</p>
-      <a href="#" class="text-blue-400 underline text-xs">Check it out</a>
-    </section>
-
-    <!-- Creator Insider -->
-    <section class="bg-gray-800 rounded-xl shadow p-4">
-      <h2 class="text-lg font-bold mb-2">Creator Insider</h2>
-      <p class="text-sm">New rules, badges, monetization updates.</p>
-      <a href="#" class="text-blue-400 underline text-xs">Watch on YouTube</a>
-    </section>
-
-    <!-- What's New -->
-    <section class="bg-gray-800 rounded-xl shadow p-4 col-span-1">
-      <h2 class="text-lg font-bold mb-2">What's new in Studio</h2>
-      <ul class="text-sm list-disc list-inside text-gray-400 space-y-1">
-        <li>Increasing Shorts length</li>
-        <li>Expansion of channel permissions</li>
-        <li>Community Guidelines update</li>
-      </ul>
-    </section>
-
+  <main class="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="dashboard">
+    <div class="col-span-3 text-center text-gray-400">Loading data...</div>
   </main>
 
   <script>
-    // Show today's date
     document.getElementById('date').textContent = new Date().toLocaleDateString();
-  </script>
 
+    const hash = window.location.hash;
+    const token = hash.match(/access_token=([^&]+)/)?.[1];
+
+    if (!token) {
+      document.getElementById("dashboard").innerHTML = '<p class="text-red-400 col-span-3 text-center">❌ Access token missing. Please login again.</p>';
+    } else {
+      loadDashboard(token);
+    }
+
+    async function loadDashboard(token) {
+      try {
+        // Get uploads playlist ID
+        const channelRes = await fetch("https://www.googleapis.com/youtube/v3/channels?part=contentDetails,snippet,statistics&mine=true", {
+          headers: { Authorization: "Bearer " + token }
+        });
+        const channel = (await channelRes.json()).items[0];
+        const playlistId = channel.contentDetails.relatedPlaylists.uploads;
+        const channelStats = channel.statistics;
+        const channelTitle = channel.snippet.title;
+
+        // Get last 5 uploaded videos
+        const videosRes = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=5&playlistId=${playlistId}`, {
+          headers: { Authorization: "Bearer " + token }
+        });
+        const videoItems = (await videosRes.json()).items;
+
+        // Get video IDs
+        const videoIds = videoItems.map(v => v.contentDetails.videoId).join(",");
+        const statsRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics,contentDetails&id=${videoIds}`, {
+          headers: { Authorization: "Bearer " + token }
+        });
+        const videoStats = (await statsRes.json()).items;
+
+        const dashboard = document.getElementById("dashboard");
+        dashboard.innerHTML = ""; // Clear loading
+
+        const latestVideo = videoItems[0];
+        const latestStat = videoStats[0];
+
+        // === 1. Latest Short Performance ===
+        dashboard.innerHTML += `
+        <section class="bg-gray-800 rounded-xl shadow p-4">
+          <h2 class="text-lg font-bold mb-2">Latest YouTube Short performance</h2>
+          <img src="${latestVideo.snippet.thumbnails.medium.url}" class="rounded mb-2" />
+          <p class="text-sm text-gray-300">${latestVideo.snippet.title}</p>
+          <p class="text-sm text-gray-400">${latestStat.statistics.viewCount} views • ${latestStat.statistics.likeCount || 0} likes</p>
+        </section>`;
+
+        // === 2. Important Notifications ===
+        const blockedIn = latestStat.contentDetails?.regionRestriction?.blocked?.length || 0;
+        const blockedMessage = blockedIn > 0
+          ? `🚫 Blocked in ${blockedIn} countries.`
+          : `✅ No restrictions.`;
+
+        dashboard.innerHTML += `
+        <section class="bg-gray-800 rounded-xl shadow p-4">
+          <h2 class="text-lg font-bold mb-2">Important notifications</h2>
+          <div class="text-sm bg-red-500 bg-opacity-20 p-2 rounded">
+            ${blockedMessage}
+            <p class="text-xs text-gray-400 mt-1">Video: ${latestVideo.snippet.title}</p>
+          </div>
+        </section>`;
+
+        // === 3. Channel Analytics ===
+        dashboard.innerHTML += `
+        <section class="bg-gray-800 rounded-xl shadow p-4">
+          <h2 class="text-lg font-bold mb-2">Channel analytics</h2>
+          <p class="text-sm mb-1">👁 Total Views: <strong>${channelStats.viewCount}</strong></p>
+          <p class="text-sm mb-1">📺 Videos: <strong>${channelStats.videoCount}</strong></p>
+          <p class="text-sm">📣 Channel: <strong>${channelTitle}</strong></p>
+        </section>`;
+
+        // === 4. Published Videos List ===
+        let videoListHTML = `<section class="bg-gray-800 rounded-xl shadow p-4 col-span-2">
+          <h2 class="text-lg font-bold mb-2">Published videos</h2>
+          <ul class="space-y-2 text-sm">`;
+
+        for (let i = 0; i < videoItems.length; i++) {
+          const v = videoItems[i];
+          const s = videoStats[i];
+          videoListHTML += `
+            <li class="flex items-center space-x-4 bg-gray-700 p-2 rounded">
+              <img src="${v.snippet.thumbnails.default.url}" class="w-14 rounded">
+              <div class="flex-1">
+                <p class="font-semibold">${v.snippet.title}</p>
+                <p class="text-xs text-gray-400">${s.statistics.viewCount} views • ${s.statistics.likeCount || 0} likes</p>
+              </div>
+              <a href="https://youtu.be/${v.contentDetails.videoId}" target="_blank" class="text-blue-400 text-sm underline">Watch</a>
+            </li>`;
+        }
+
+        videoListHTML += "</ul></section>";
+        dashboard.innerHTML += videoListHTML;
+
+      } catch (err) {
+        document.getElementById("dashboard").innerHTML = `<p class="text-red-400 col-span-3 text-center">❌ Failed to load data: ${err.message}</p>`;
+      }
+    }
+  </script>
 </body>
 </html>
