@@ -1,193 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube CMS Dashboard</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@500&display=swap">
+  <meta charset="UTF-8">
+  <title>YouTube Rights Management Dashboard</title>
   <style>
     body {
-      background-color: #0f0f0f;
+      background: #0f0f0f;
       color: white;
-      font-family: 'Roboto', sans-serif;
-      margin: 0;
-      padding: 0;
+      font-family: Arial, sans-serif;
+      padding: 20px;
     }
-
-    header {
-      text-align: center;
-      padding: 25px;
-      background: linear-gradient(to right, #00f260, #0575e6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-size: 34px;
-      font-weight: bold;
-      border-bottom: 2px solid #222;
+    h1 {
+      font-size: 28px;
+      color: #00e5ff;
+      margin-bottom: 30px;
     }
-
-    .container {
-      max-width: 960px;
-      margin: 40px auto;
-      padding: 0 20px;
-    }
-
     .video {
-      background: #1e1e1e;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,255,200,0.05);
-      margin-bottom: 24px;
-      overflow: hidden;
-      animation: pop 0.5s ease;
+      background: #1f1f1f;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 5px #03a9f4;
     }
-
-    @keyframes pop {
-      0% { opacity: 0; transform: scale(0.95); }
-      100% { opacity: 1; transform: scale(1); }
-    }
-
     .video-title {
       font-size: 18px;
-      padding: 12px 16px;
-      background-color: #222;
-      border-bottom: 1px solid #444;
       font-weight: bold;
     }
-
     iframe {
       width: 100%;
-      height: 220px;
-    }
-
-    .actions {
-      padding: 12px 16px;
-      background: #121212;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-    }
-
-    .btn {
-      background: linear-gradient(to right, #03a9f4, #00e5ff);
-      color: black;
-      font-weight: bold;
-      padding: 8px 16px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      margin: 5px 0;
-    }
-
-    .btn:hover {
-      transform: scale(1.05);
-    }
-
-    .meta {
-      font-size: 14px;
-      color: #90caf9;
-    }
-
-    .popup {
-      position: fixed;
-      top: 30px;
-      right: 30px;
-      background-color: #1e88e5;
-      padding: 12px 20px;
+      height: 200px<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube Rights Management Dashboard</title>
+  <style>
+    body {
+      background: #0f0f0f;
       color: white;
-      border-radius: 8px;
-      font-size: 16px;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      font-size: 28px;
+      color: #00e5ff;
+      margin-bottom: 30px;
+    }
+    .video {
+      background: #1f1f1f;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 0 5px #03a9f4;
+    }
+    .video-title {
+      font-size: 18px;
       font-weight: bold;
-      opacity: 0;
-      transform: translateY(-20px);
-      transition: all 0.5s ease;
-      z-index: 999;
     }
-
-    .popup.show {
-      opacity: 1;
-      transform: translateY(0);
+    iframe {
+      width: 100%;
+      height: 200px;
+      border-radius: 8px;
     }
-
-    .popup.error { background-color: #e53935; }
-    .popup.success { background-color: #43a047; }
+    .btn {
+      background: #03a9f4;
+      color: black;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .status {
+      margin-top: 5px;
+      font-size: 14px;
+      color: #ccc;
+    }
   </style>
 </head>
 <body>
-  <header>📊 YouTube Rights Management Dashboard</header>
-  <div class="container" id="video-list">📺 Loading videos...</div>
-  <div id="popup" class="popup"></div>
+  <h1>🛡️ YouTube Rights Management Dashboard</h1>
+  <div id="video-list">Loading videos...</div>
 
   <script>
-    function showPopup(message, type = "success") {
-      const popup = document.getElementById("popup");
-      popup.textContent = message;
-      popup.className = `popup show ${type}`;
-      setTimeout(() => popup.className = "popup", 3000);
-    }
-
     async function fetchVideos() {
-      const token = localStorage.getItem("access_token");
-      const container = document.getElementById("video-list");
+      const accessToken = localStorage.getItem("access_token");
 
-      if (!token) {
-        container.innerHTML = "❌ Access token missing.";
+      if (!accessToken) {
+        document.getElementById("video-list").innerText = "❌ Access token not found.";
         return;
       }
 
       try {
         const channelRes = await fetch("https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true", {
-          headers: { Authorization: `Bearer ${token}` }
+          headers: { Authorization: `Bearer ${accessToken}` }
         });
         const channelData = await channelRes.json();
-        const playlistId = channelData.items[0].contentDetails.relatedPlaylists.uploads;
+        const uploadsId = channelData.items[0].contentDetails.relatedPlaylists.uploads;
 
-        const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=10&playlistId=${playlistId}`, {
-          headers: { Authorization: `Bearer ${token}` }
+        const videoRes = await fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsId}&maxResults=10`, {
+          headers: { Authorization: `Bearer ${accessToken}` }
         });
-        const videoData = await videoRes.json();
+        const videos = await videoRes.json();
 
-        container.innerHTML = "";
-        for (const item of videoData.items) {
-          const videoId = item.snippet.resourceId.videoId;
-          const title = item.snippet.title;
+        const list = document.getElementById("video-list");
+        list.innerHTML = "";
 
-          const statsRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=statistics,monetizationDetails,contentDetails&id=${videoId}`, {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          const statsData = await statsRes.json();
-          const stats = statsData.items[0];
-
-          const views = stats.statistics.viewCount;
-          const likes = stats.statistics.likeCount;
-          const monetized = stats.monetizationDetails?.access !== "none" ? "Yes" : "No";
-          const contentId = stats.contentDetails?.licensedContent ? "Matched" : "Not matched";
+        videos.items.forEach(video => {
+          const vidId = video.snippet.resourceId.videoId;
+          const title = video.snippet.title;
 
           const div = document.createElement("div");
           div.className = "video";
           div.innerHTML = `
             <div class="video-title">${title}</div>
-            <iframe src="https://www.youtube.com/embed/${videoId}" allowfullscreen></iframe>
-            <div class="actions">
-              <button class="btn" onclick="applyRestriction('${videoId}')">Restrict to BD 🇧🇩</button>
-              <div class="meta">👁️ ${views} views | 👍 ${likes} likes | 💰 Monetized: ${monetized} | 🧬 Content ID: ${contentId}</div>
-            </div>
+            <iframe src="https://www.youtube.com/embed/${vidId}" allowfullscreen></iframe>
+            <button class="btn" onclick="restrictVideo('${vidId}', this)">Apply BD Restriction</button>
+            <div class="status" id="status-${vidId}">Ready</div>
           `;
-          container.appendChild(div);
-        }
+          list.appendChild(div);
+        });
 
       } catch (err) {
         console.error(err);
-        container.innerHTML = "❌ Error loading videos.";
+        document.getElementById("video-list").innerText = "❌ Error loading videos.";
       }
     }
 
-    async function applyRestriction(videoId) {
-      const token = localStorage.getItem("access_token");
+    async function restrictVideo(videoId, btn) {
+      const accessToken = localStorage.getItem("access_token");
+
+      btn.disabled = true;
+      btn.innerText = "Restricting...";
 
       try {
         const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails`, {
           method: "PUT",
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
@@ -201,14 +151,18 @@
         });
 
         if (res.ok) {
-          showPopup("✅ Restricted to Bangladesh", "success");
+          document.getElementById(`status-${videoId}`).innerText = "✅ Restricted to Bangladesh";
         } else {
-          showPopup("❌ Restriction failed", "error");
+          document.getElementById(`status-${videoId}`).innerText = "❌ Failed to apply restriction";
         }
+
       } catch (e) {
         console.error(e);
-        showPopup("❌ Network error", "error");
+        document.getElementById(`status-${videoId}`).innerText = "❌ Error during request";
       }
+
+      btn.disabled = false;
+      btn.innerText = "Apply BD Restriction";
     }
 
     fetchVideos();
