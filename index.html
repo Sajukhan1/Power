@@ -2,68 +2,66 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube CMS Login</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" />
+  <title>YouTube Studio Login</title>
   <style>
     body {
-      font-family: 'Roboto', sans-serif;
+      background: #0f0f0f;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
-      height: 100vh;
       justify-content: center;
       align-items: center;
-      background: linear-gradient(135deg, #e52d27, #b31217);
-      color: white;
+      height: 100vh;
       margin: 0;
     }
-    .card {
-      background: white;
-      color: black;
-      padding: 3rem;
-      border-radius: 1rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+    .login-container {
+      background: #1e1e1e;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
       text-align: center;
-      max-width: 400px;
     }
-    .card h1 {
-      font-size: 1.8rem;
-      margin-bottom: 1rem;
+
+    .login-container h1 {
+      margin-bottom: 20px;
     }
+
     .login-btn {
       background-color: #ff0000;
       color: white;
-      padding: 0.8rem 2rem;
-      font-size: 1rem;
       border: none;
-      border-radius: 0.5rem;
+      padding: 12px 24px;
+      font-size: 18px;
+      border-radius: 8px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: background 0.3s;
     }
+
     .login-btn:hover {
       background-color: #cc0000;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Login to YouTube Rights CMS</h1>
-    <button class="login-btn" onclick="loginWithYouTube()">Sign in with YouTube</button>
+  <div class="login-container">
+    <h1>Login with Google</h1>
+    <button class="login-btn" onclick="loginWithGoogle()">Sign in with Google</button>
   </div>
 
   <script>
-    function loginWithYouTube() {
-      const clientId = '85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com';
-      const redirectUri = 'https://saju-live.vercel.app/callback.html';
-      const scope = encodeURIComponent([
-        'https://www.googleapis.com/auth/youtube.force-ssl',
-        'https://www.googleapis.com/auth/youtubepartner',
-        'https://www.googleapis.com/auth/youtubepartner-content-owner',
-        'https://www.googleapis.com/auth/youtube',
-        'https://www.googleapis.com/auth/youtube.readonly',
-        'https://www.googleapis.com/auth/youtube.upload',
-        'https://www.googleapis.com/auth/youtube.channel-memberships.creator'
-      ].join(' '));
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}&include_granted_scopes=true`;
+    function loginWithGoogle() {
+      const clientId = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
+      const redirectUri = "https://saju-live.vercel.app/callback.html";
+      const scope = [
+        "https://www.googleapis.com/auth/youtube.readonly",
+        "https://www.googleapis.com/auth/youtube.upload",
+        "https://www.googleapis.com/auth/youtube",
+        "https://www.googleapis.com/auth/youtube.force-ssl",
+        "https://www.googleapis.com/auth/youtube.channel-memberships.creator"
+      ].join(" ");
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${encodeURIComponent(scope)}&include_granted_scopes=true`;
+
       window.location.href = authUrl;
     }
   </script>
