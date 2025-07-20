@@ -3,135 +3,158 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube Studio CMS</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <title>YouTube Studio Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     body {
       margin: 0;
-      font-family: 'Roboto', sans-serif;
-      background-color: #121212;
-      color: #fff;
+      font-family: Arial, sans-serif;
+      background-color: #181818;
+      color: white;
       display: flex;
+      height: 100vh;
     }
 
     .sidebar {
-      width: 250px;
-      background-color: #202020;
-      height: 100vh;
-      padding: 20px;
-      box-sizing: border-box;
+      width: 240px;
+      background-color: #212121;
+      height: 100%;
+      padding-top: 20px;
+      display: flex;
+      flex-direction: column;
     }
 
     .sidebar h2 {
+      padding: 10px 20px;
       font-size: 20px;
-      margin-bottom: 30px;
-    }
-
-    .sidebar h2 i {
-      color: red;
-      margin-right: 8px;
+      color: #fff;
     }
 
     .menu-item {
-      padding: 10px 15px;
-      border-radius: 10px;
+      padding: 14px 20px;
+      color: #fff;
       display: flex;
       align-items: center;
-      gap: 12px;
       cursor: pointer;
-      margin-bottom: 8px;
       transition: background 0.3s;
+    }
+
+    .menu-item i {
+      margin-right: 12px;
+      width: 20px;
     }
 
     .menu-item:hover,
     .menu-item.active {
-      background-color: #373737;
+      background-color: #383838;
     }
 
-    .menu-item i {
-      font-size: 18px;
-      width: 20px;
-      text-align: center;
+    .submenu {
+      display: none;
+      flex-direction: column;
+      background-color: #2a2a2a;
     }
 
-    .main-content {
+    .submenu .menu-item {
+      padding-left: 50px;
+      font-size: 14px;
+    }
+
+    .content {
       flex: 1;
-      padding: 20px;
-    }
-
-    .main-content h3 {
-      font-size: 22px;
-      margin-bottom: 15px;
+      padding: 30px;
+      overflow-y: auto;
     }
 
     .video-card {
-      background-color: #1e1e1e;
-      border-radius: 10px;
-      padding: 10px;
+      background-color: #2b2b2b;
       margin-bottom: 20px;
+      padding: 10px;
+      border-radius: 8px;
       display: flex;
-      gap: 15px;
+      gap: 12px;
+      align-items: center;
     }
 
-    .video-card img {
+    .video-thumbnail img {
       width: 160px;
       height: 90px;
-      object-fit: cover;
-      border-radius: 6px;
+      border-radius: 4px;
     }
 
-    .video-details h4 {
+    .video-info h4 {
       margin: 0;
       font-size: 16px;
     }
 
-    .video-details p {
-      margin: 4px 0;
-      font-size: 14px;
-      color: #aaa;
+    .video-info p {
+      margin: 4px 0 0;
+      font-size: 13px;
+      color: #ccc;
     }
   </style>
 </head>
 <body>
 
   <div class="sidebar">
-    <h2><i class="fas fa-play"></i> YouTube Studio <span style="color: red;">&#x2B;</span></h2>
-    <div class="menu-item active"><i class="fas fa-home"></i> Dashboard</div>
-    <div class="menu-item"><i class="fas fa-folder"></i> Content</div>
-    <div class="menu-item"><i class="fas fa-chart-line"></i> Analytics</div>
-    <div class="menu-item"><i class="fas fa-comments"></i> Comments</div>
-    <div class="menu-item"><i class="fas fa-dollar-sign"></i> Monetization</div>
-    <div class="menu-item"><i class="fas fa-cog"></i> Settings</div>
+    <h2><i class="fa-solid fa-play text-red"></i> Studio</h2>
+    <div class="menu-item active"><i class="fa-solid fa-house"></i> Dashboard</div>
+    <div class="menu-item"><i class="fa-solid fa-video"></i> Content</div>
+    <div class="menu-item" onclick="toggleDropdown()">
+      <i class="fa-solid fa-chart-line"></i> Analytics 
+      <i class="fa-solid fa-chevron-down" style="margin-left:auto;"></i>
+    </div>
+    <div id="dropdown" class="submenu">
+      <div class="menu-item">Overview</div>
+      <div class="menu-item">Reach</div>
+      <div class="menu-item">Engagement</div>
+    </div>
+    <div class="menu-item"><i class="fa-regular fa-comments"></i> Comments</div>
+    <div class="menu-item"><i class="fa-solid fa-dollar-sign"></i> Monetization</div>
+    <div class="menu-item"><i class="fa-solid fa-gear"></i> Settings</div>
   </div>
 
-  <div class="main-content">
-    <h3>Published Videos</h3>
+  <div class="content">
+    <h2>Videos</h2>
 
     <div class="video-card">
-      <img src="https://img.youtube.com/vi/PUB1/thumb.jpg" alt="Video Thumbnail"/>
-      <div class="video-details">
+      <div class="video-thumbnail">
+        <img src="https://img.youtube.com/vi/kXYiU_JCYtU/mqdefault.jpg" alt="thumb">
+      </div>
+      <div class="video-info">
         <h4>My First Vlog in Dhaka</h4>
-        <p>12K views • 340 likes</p>
+        <p>12K views · 340 likes</p>
       </div>
     </div>
 
     <div class="video-card">
-      <img src="https://img.youtube.com/vi/PUB2/thumb.jpg" alt="Video Thumbnail"/>
-      <div class="video-details">
-        <h4>Cox’s Bazar Tour</h4>
-        <p>8.5K views • 200 likes</p>
+      <div class="video-thumbnail">
+        <img src="https://img.youtube.com/vi/6ZfuNTqbHE8/mqdefault.jpg" alt="thumb">
       </div>
-    </div>
-
-    <div class="video-card">
-      <img src="https://img.youtube.com/vi/PUB3/thumb.jpg" alt="Video Thumbnail"/>
-      <div class="video-details">
+      <div class="video-info">
         <h4>Studio Tips & Tricks</h4>
-        <p>15K views • 600 likes</p>
+        <p>15K views · 600 likes</p>
       </div>
     </div>
+
+    <div class="video-card">
+      <div class="video-thumbnail">
+        <img src="https://img.youtube.com/vi/Z1BCujX3pw8/mqdefault.jpg" alt="thumb">
+      </div>
+      <div class="video-info">
+        <h4>Cox’s Bazar Travel</h4>
+        <p>9.8K views · 420 likes</p>
+      </div>
+    </div>
+
   </div>
+
+  <script>
+    function toggleDropdown() {
+      const dropdown = document.getElementById('dropdown');
+      dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
+    }
+  </script>
 
 </body>
 </html>
