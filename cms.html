@@ -117,15 +117,8 @@
       margin-bottom: 2px;
     }
 
-    /* Responsive */
-    @media (max-width: 480px) {
-      .video-title {
-        font-size: 0.9rem;
-      }
-
-      .video-stats {
-        font-size: 0.75rem;
-      }
+    #video-list {
+      margin-bottom: 80px;
     }
   </style>
 </head>
@@ -133,46 +126,22 @@
 
 <header>
   <img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Studio_icon_%282020%29.svg" alt="Studio" />
-  <img src="https://yt3.googleusercontent.com/ytc/AIdro_nPfZkKYZL9YdG-ABh-LHf13sdyqW3zAf1hAw=s88-c-k-c0x00ffffff-no-rj" alt="User" />
+  <img id="user-photo" src="https://yt3.googleusercontent.com/ytc/AIdro_nPfZkKYZL9YdG-ABh-LHf13sdyqW3zAf1hAw=s88-c-k-c0x00ffffff-no-rj" alt="User" />
 </header>
 
 <div class="channel-section">
-  <div class="channel-avatar"></div>
-  <div class="channel-name">Saju Bhai 2.0</div>
-  <div style="font-size: 0.85rem; color: #aaa;">3 subscribers</div>
+  <div class="channel-avatar" id="avatar"></div>
+  <div class="channel-name" id="channel-name">Loading...</div>
+  <div style="font-size: 0.85rem; color: #aaa;" id="subscriber-count">...</div>
 </div>
 
 <div class="analytics">
-  <div><strong>740</strong><br/>Views</div>
-  <div><strong>1.0</strong><br/>Watch time</div>
+  <div><strong id="viewCount">0</strong><br/>Views</div>
+  <div><strong id="watchTime">0</strong><br/>Watch time</div>
 </div>
 
-<!-- Video Cards -->
-<div class="video-card">
-  <img src="https://i.ytimg.com/vi/VIDEO_ID/maxresdefault.jpg" alt="Thumbnail" />
-  <div class="video-info">
-    <div class="video-title">🤣🤣🤣🤣 #freefire #fff...</div>
-    <div class="video-stats">623 views • 7 likes • 0 comments</div>
-  </div>
-</div>
+<div id="video-list"></div>
 
-<div class="video-card">
-  <img src="https://i.ytimg.com/vi/VIDEO_ID2/maxresdefault.jpg" alt="Thumbnail" />
-  <div class="video-info">
-    <div class="video-title">🤣🤣🤣🤣🤣</div>
-    <div class="video-stats">17 views • 0 likes • 0 comments</div>
-  </div>
-</div>
-
-<div class="video-card">
-  <img src="https://i.ytimg.com/vi/VIDEO_ID3/maxresdefault.jpg" alt="Thumbnail" />
-  <div class="video-info">
-    <div class="video-title">না দেখলে মিস করবেন 🤣🤣</div>
-    <div class="video-stats">6 views • 0 likes • 0 comments</div>
-  </div>
-</div>
-
-<!-- Bottom Navigation -->
 <div class="bottom-nav">
   <div class="active"><i class="fas fa-home"></i><span>Dashboard</span></div>
   <div><i class="fas fa-video"></i><span>Content</span></div>
@@ -180,6 +149,56 @@
   <div><i class="fas fa-users"></i><span>Community</span></div>
   <div><i class="fas fa-dollar-sign"></i><span>Earn</span></div>
 </div>
+
+<script>
+  const token = localStorage.getItem("access_token");
+  if (!token) {
+    window.location.href = "index.html"; // Redirect to login if token missing
+  }
+
+  async function fetchChannelData() {
+    const res = await fetch("https://www.googleapis.com/youtube/v3/channels?part=snippet,statistics&mine=true", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    const channel = data.items[0];
+
+    document.getElementById("channel-name").innerText = channel.snippet.title;
+    document.getElementById("subscriber-count").innerText = `${channel.statistics.subscriberCount} subscribers`;
+    document.getElementById("viewCount").innerText = channel.statistics.viewCount;
+    document.getElementById("user-photo").src = channel.snippet.thumbnails.default.url;
+    document.getElementById("avatar").style.backgroundImage = `url(${channel.snippet.thumbnails.default.url})`;
+    document.getElementById("avatar").style.backgroundSize = "cover";
+  }
+
+  async function fetchVideos() {
+    const res = await fetch("https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=5&mine=true&type=video", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    const data = await res.json();
+    const list = document.getElementById("video-list");
+
+    data.items.forEach(item => {
+      const videoId = item.id.videoId;
+      const title = item.snippet.title;
+      const thumb = item.snippet.thumbnails.medium.url;
+
+      const card = document.createElement("div");
+      card.className = "video-card";
+      card.innerHTML = `
+        <img src="${thumb}" alt="Thumbnail" />
+        <div class="video-info">
+          <div class="video-title">${title}</div>
+          <div class="video-stats">Fetching stats...</div>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  fetchChannelData();
+  fetchVideos();
+</script>
 
 </body>
 </html>
