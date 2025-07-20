@@ -29,12 +29,12 @@
       const tokenType = params.get("token_type");
 
       if (accessToken) {
-        // Save tokens securely
+        // ✅ Store token in browser
         localStorage.setItem("access_token", accessToken);
         localStorage.setItem("token_type", tokenType || "Bearer");
         localStorage.setItem("expires_in", expiresIn || "3600");
 
-        // ✅ Safe redirect to cms.html (no query param)
+        // ✅ Redirect to CMS dashboard
         window.location.href = "/cms.html";
       } else {
         document.body.innerHTML = "❌ Failed to authenticate. Please try again.";
