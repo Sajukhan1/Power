@@ -33,10 +33,10 @@
     .card h1 {
       font-size: 1.6rem;
       margin-bottom: 1.5rem;
-      color: #e74c3c;
+      color: #ffcc00;
     }
     .login-btn {
-      background: linear-gradient(135deg, #ff4e50, #f9d423);
+      background: linear-gradient(135deg, #1877f2, #42a5f5);
       color: #fff;
       font-weight: bold;
       border: none;
@@ -73,6 +73,12 @@
 
       window.location.href = url;
     }
+
+    // ⏰ Auto re-login after 55 minutes (token is valid for ~1 hour)
+    setTimeout(() => {
+      alert("Session expired. Please log in again.");
+      loginWithGoogle();
+    }, 55 * 60 * 1000); // 55 minutes
   </script>
 </body>
 </html>
