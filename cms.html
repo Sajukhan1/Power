@@ -87,14 +87,50 @@
       font-size: 14px;
       color: #90caf9;
     }
+
+    .popup {
+      position: fixed;
+      top: 30px;
+      right: 30px;
+      background-color: #1e88e5;
+      padding: 12px 20px;
+      color: white;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      opacity: 0;
+      transform: translateY(-20px);
+      transition: all 0.5s ease;
+      z-index: 999;
+    }
+
+    .popup.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .popup.error {
+      background-color: #e53935;
+    }
+
+    .popup.success {
+      background-color: #43a047;
+    }
   </style>
 </head>
 <body>
   <header>YouTube CMS Dashboard</header>
-
   <div class="container" id="video-list">📺 Loading your videos...</div>
+  <div id="popup" class="popup"></div>
 
   <script>
+    function showPopup(message, type = "success") {
+      const popup = document.getElementById("popup");
+      popup.textContent = message;
+      popup.className = `popup show ${type}`;
+      setTimeout(() => popup.className = "popup", 3000);
+    }
+
     async function fetchMyVideos() {
       const accessToken = localStorage.getItem("access_token");
 
@@ -176,14 +212,17 @@
 
         if (response.ok) {
           statusDiv.textContent = "✅ Restricted to Bangladesh only.";
+          showPopup("✅ Restriction applied successfully", "success");
         } else {
           const errData = await response.json();
           console.error(errData);
           statusDiv.textContent = "❌ Error applying restriction.";
+          showPopup("❌ Failed to apply restriction", "error");
         }
       } catch (err) {
         console.error(err);
         statusDiv.textContent = "❌ Network error.";
+        showPopup("❌ Network error", "error");
       }
     }
 
