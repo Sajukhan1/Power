@@ -3,94 +3,102 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube Studio Panel</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <title>YouTube CMS</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
     body {
-      font-family: 'Inter', sans-serif;
       background: #0f0f0f;
       color: white;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-image: linear-gradient(145deg, #111, #000);
+      font-family: 'Inter', sans-serif;
+      padding: 20px;
     }
-    .card {
-      background: #1c1c1c;
-      padding: 2.5rem;
-      border-radius: 14px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-      text-align: center;
-      width: 90%;
-      max-width: 360px;
+    h1 {
+      color: #00acee;
     }
-    .card h1 {
-      font-size: 1.6rem;
-      margin-bottom: 1.5rem;
-      color: #ffcc00;
+    .video-card {
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px 0;
+      background: #1e1e1e;
     }
-    .login-btn {
-      background: linear-gradient(-45deg, #ff4e50, #f9d423, #24c6dc, #5433ff);
-      background-size: 400% 400%;
-      color: #fff;
-      font-weight: bold;
+    button {
+      background-color: #1e88e5;
+      color: white;
+      padding: 8px 12px;
       border: none;
-      padding: 0.75rem 1.5rem;
-      border-radius: 6px;
-      font-size: 1rem;
+      border-radius: 5px;
       cursor: pointer;
-      transition: all 0.3s ease;
-      animation: gradientShift 6s ease infinite;
     }
-    .login-btn:hover {
-      opacity: 0.9;
-      transform: scale(1.05);
-    }
-    @keyframes gradientShift {
-      0% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
-    }
-    .footer {
-      margin-top: 2rem;
-      font-size: 0.8rem;
-      color: #888;
+    button:hover {
+      background-color: #1565c0;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>YouTube Studio Panel</h1>
-    <button class="login-btn" onclick="loginWithGoogle()">Sign in with Google</button>
-    <div class="footer">Powered by Saju • OAuth 2.0</div>
-  </div>
+  <h1>YouTube CMS Dashboard</h1>
+  <div id="video-list">Loading videos...</div>
 
   <script>
-    function loginWithGoogle() {
-      const clientId = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
-      const redirectUri = window.location.origin + "/callback.html";
-      const scope = [
-        "https://www.googleapis.com/auth/youtube.force-ssl",
-        "https://www.googleapis.com/auth/userinfo.profile",
-        "https://www.googleapis.com/auth/userinfo.email"
-      ].join(" ");
+    const accessToken = localStorage.getItem("access_token");
 
-      const url = `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&prompt=consent&access_type=online`;
+    async function fetchVideos() {
+      const res = await fetch("https://www.googleapis.com/youtube/v3/videos?part=snippet&mine=true&maxResults=10", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        }
+      });
+      const data = await res.json();
 
-      window.location.href = url;
+      if (!data.items || data.items.length === 0) {
+        document.getElementById("video-list").innerText = "❌ No videos found.";
+        return;
+      }
+
+      const list = document.getElementById("video-list");
+      list.innerHTML = "";
+
+      data.items.forEach(video => {
+        const card = document.createElement("div");
+        card.className = "video-card";
+        card.innerHTML = `
+          <h3>${video.snippet.title}</h3>
+          <p>${video.snippet.description}</p>
+          <button onclick="restrictVideo('${video.id}')">Restrict to Bangladesh</button>
+        `;
+        list.appendChild(card);
+      });
     }
 
-    // Optional: Auto-expire token after 55 mins
-    setTimeout(() => {
-      alert("Session expired. Please log in again.");
-      loginWithGoogle();
-    }, 55 * 60 * 1000);
+    async function restrictVideo(videoId) {
+      const body = {
+        id: videoId,
+        snippet: {},
+        status: {
+          privacyStatus: "public",
+          regionRestriction: {
+            allowed: ["BD"]
+          }
+        }
+      };
+
+      const res = await fetch("https://www.googleapis.com/youtube/v3/videos?part=status", {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        alert(`✅ Video ${videoId} restricted to Bangladesh.`);
+      } else {
+        const err = await res.json();
+        alert("❌ Failed: " + (err.error?.message || "Unknown error"));
+      }
+    }
+
+    fetchVideos();
   </script>
 </body>
 </html>
