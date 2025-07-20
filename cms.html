@@ -1,106 +1,157 @@
-<!-- 📁 cms.html (Phase 1: Sidebar + Layout) -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube Studio Dashboard</title>
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+  <title>YouTube Studio+</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-    body { background-color: #181818; color: white; display: flex; height: 100vh; }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+    body {
+      display: flex;
+      min-height: 100vh;
+      background-color: #0f0f0f;
+      color: white;
+    }
     .sidebar {
       width: 240px;
-      background-color: #202020;
-      padding-top: 60px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      bottom: 0;
+      background-color: #212121;
+      padding: 20px 10px;
     }
-
-    .sidebar .menu-item {
+    .logo {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      color: white;
       display: flex;
       align-items: center;
-      padding: 12px 20px;
+    }
+    .logo span {
+      color: red;
+      font-size: 26px;
+      margin-right: 8px;
+    }
+    .logo sup {
+      background: #ff0000;
+      color: #fff;
+      padding: 2px 4px;
+      font-size: 10px;
+      border-radius: 4px;
+      margin-left: 4px;
+    }
+    ul.nav {
+      list-style: none;
+    }
+    ul.nav li {
+      padding: 12px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
       cursor: pointer;
-      color: #ccc;
       transition: background 0.2s;
     }
-
-    .sidebar .menu-item:hover {
-      background-color: #373737;
-      color: white;
+    ul.nav li:hover, ul.nav li.active {
+      background-color: #383838;
     }
-
-    .sidebar .material-icons {
-      margin-right: 15px;
+    .dropdown-content {
+      display: none;
+      flex-direction: column;
+      margin-left: 20px;
     }
-
-    .topbar {
-      height: 60px;
-      width: 100%;
-      background-color: #202020;
+    .dropdown.active .dropdown-content {
       display: flex;
-      align-items: center;
-      padding: 0 20px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 999;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
-
-    .topbar h1 {
-      font-size: 20px;
-      margin-left: 10px;
-    }
-
     .main {
-      margin-left: 240px;
-      margin-top: 60px;
+      flex: 1;
       padding: 20px;
-      width: calc(100% - 240px);
       overflow-y: auto;
     }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      font-weight: bold;
-      color: white;
+    .main h2 {
+      font-size: 24px;
+      margin-bottom: 20px;
     }
-
-    .logo .material-icons {
-      color: red;
-      margin-right: 5px;
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .video-card {
+      background-color: #1e1e1e;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .video-thumb {
+      height: 160px;
+      background-color: #333;
+      background-size: cover;
+      background-position: center;
+    }
+    .video-info {
+      padding: 10px;
+    }
+    .video-info h4 {
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+    .video-info .video-stats {
+      font-size: 14px;
+      color: #aaa;
     }
   </style>
 </head>
 <body>
-  <!-- Sidebar -->
   <div class="sidebar">
-    <div class="menu-item"><span class="material-icons">dashboard</span>Dashboard</div>
-    <div class="menu-item"><span class="material-icons">slideshow</span>Content</div>
-    <div class="menu-item"><span class="material-icons">bar_chart</span>Analytics</div>
-    <div class="menu-item"><span class="material-icons">comment</span>Comments</div>
-    <div class="menu-item"><span class="material-icons">attach_money</span>Monetization</div>
-    <div class="menu-item"><span class="material-icons">settings</span>Settings</div>
+    <div class="logo">
+      <span>▶</span> YouTube Studio<sup>+</sup>
+    </div>
+    <ul class="nav">
+      <li class="active">🏠 Dashboard</li>
+      <li>📁 Content</li>
+      <li>📊 Analytics</li>
+      <li>💬 Comments</li>
+      <li>💰 Monetization</li>
+      <li class="dropdown" onclick="this.classList.toggle('active')">
+        ⚙️ Settings ⮟
+        <div class="dropdown-content">
+          <span>Channel</span>
+          <span>Upload Defaults</span>
+          <span>Permissions</span>
+          <span>Community</span>
+        </div>
+      </li>
+    </ul>
   </div>
 
-  <!-- Topbar -->
-  <div class="topbar">
-    <div class="logo">
-      <span class="material-icons">play_circle_filled</span>
-      <h1>YouTube Studio</h1>
+  <div class="main">
+    <h2>Published Videos</h2>
+    <div class="video-grid">
+      <div class="video-card">
+        <div class="video-thumb" style="background-image: url('https://img.youtube.com/vi/5To0cZTC-rU/hqdefault.jpg');"></div>
+        <div class="video-info">
+          <h4>My First Vlog in Dhaka</h4>
+          <div class="video-stats">12K views · 340 likes</div>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb" style="background-image: url('https://img.youtube.com/vi/s9JjYa4eVRw/hqdefault.jpg');"></div>
+        <div class="video-info">
+          <h4>Cox’s Bazar Tour</h4>
+          <div class="video-stats">8.5K views · 200 likes</div>
+        </div>
+      </div>
+      <div class="video-card">
+        <div class="video-thumb" style="background-image: url('https://img.youtube.com/vi/6ZfuNTqbHE8/hqdefault.jpg');"></div>
+        <div class="video-info">
+          <h4>Studio Tips & Tricks</h4>
+          <div class="video-stats">15K views · 600 likes</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Main -->
-  <div class="main">
-    <h2>Welcome to Your Dashboard</h2>
-    <p>This is the beginning of your custom YouTube Studio panel.</p>
-  </div>
+  <script>
+    // No JS needed, dropdown uses toggle class.
+  </script>
 </body>
 </html>
