@@ -1,128 +1,115 @@
-<!-- cms.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>YouTube Studio Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>YouTube Studio Mobile</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * {
-      box-sizing: border-box;
-      font-family: 'Roboto', sans-serif;
-      margin: 0;
-      padding: 0;
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Roboto', sans-serif; }
+    body { background-color: #0f0f0f; color: white; padding-bottom: 70px; }
+
+    header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; background-color: #212121;
     }
-    body {
-      display: flex;
-      min-height: 100vh;
-      background: #181818;
-      color: #fff;
+
+    .channel-info {
+      text-align: center; margin-top: 10px;
     }
-    .sidebar {
-      width: 220px;
-      background-color: #202020;
-      padding: 1rem 0.5rem;
-      display: flex;
-      flex-direction: column;
+
+    .channel-info img {
+      width: 80px; height: 80px; border-radius: 50%;
     }
-    .sidebar h2 {
-      font-size: 1.2rem;
-      padding: 1rem;
+
+    .channel-info h2 {
+      font-size: 20px; margin-top: 5px;
     }
-    .sidebar a {
-      color: #fff;
-      padding: 0.8rem 1rem;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      transition: background 0.2s ease;
+
+    .analytics {
+      display: flex; justify-content: space-around; background: #1e1e1e; padding: 15px 0;
+      margin: 10px 15px; border-radius: 10px;
     }
-    .sidebar a:hover {
-      background: #383838;
+
+    .video-list {
+      margin: 10px 15px;
     }
-    .main {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
+
+    .video-card {
+      background-color: #1e1e1e; border-radius: 10px; margin-bottom: 12px; padding: 10px;
     }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1rem;
+
+    .video-card img {
+      width: 100%; border-radius: 8px;
     }
-    .card {
-      background-color: #252525;
-      border-radius: 8px;
-      padding: 1rem;
-      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+
+    .video-title {
+      margin: 8px 0; font-weight: bold; font-size: 14px;
     }
-    .card h3 {
-      font-size: 1rem;
-      margin-bottom: 0.5rem;
+
+    .stats {
+      font-size: 13px; color: #ccc;
     }
-    .video-thumb {
-      width: 100%;
-      border-radius: 6px;
-      margin-top: 0.5rem;
+
+    footer {
+      position: fixed; bottom: 0; left: 0; width: 100%; background: #212121;
+      display: flex; justify-content: space-around; padding: 8px 0;
+      border-top: 1px solid #333;
     }
-    .analytics p {
-      font-size: 0.9rem;
-      margin: 0.3rem 0;
+
+    footer div {
+      text-align: center; color: #bbb; font-size: 12px;
     }
-    .header {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
-    @media (max-width: 768px) {
-      .sidebar {
-        display: none;
-      }
+
+    footer div.active {
+      color: white;
     }
   </style>
 </head>
 <body>
-  <aside class="sidebar">
-    <h2>📺 Studio</h2>
-    <a href="#"><span>🏠</span> Dashboard</a>
-    <a href="#"><span>📁</span> Content</a>
-    <a href="#"><span>📊</span> Analytics</a>
-    <a href="#"><span>💬</span> Comments</a>
-    <a href="#"><span>💰</span> Monetization</a>
-    <a href="#"><span>⚙️</span> Settings</a>
-  </aside>
 
-  <main class="main">
-    <div class="header">Channel Dashboard</div>
-    <div class="grid">
-      <div class="card">
-        <h3>Latest Video Performance</h3>
-        <img class="video-thumb" src="https://img.youtube.com/vi/5To0cZTC-rU/mqdefault.jpg" alt="Latest Video">
-        <p>Views: 623</p>
-        <p>Likes: 7</p>
-        <p>Watch time: 95%</p>
-      </div>
-      <div class="card">
-        <h3>Important Notifications</h3>
-        <p>🚫 One video is blocked in some countries.</p>
-        <button style="margin-top:10px;padding:6px 12px;background:#ff4d4d;border:none;border-radius:4px;color:#fff;">View Options</button>
-      </div>
-      <div class="card analytics">
-        <h3>Channel Analytics</h3>
-        <p>Subscribers: 3</p>
-        <p>Views (28 days): 740</p>
-        <p>Watch time: 1.0 hours</p>
-      </div>
-      <div class="card">
-        <h3>Top Videos</h3>
-        <ul style="list-style:none;margin-top:0.5rem;">
-          <li>▶ Phulki 16 July 2025 - 0 views</li>
-          <li>▶ Avengers Trailer - 153 views</li>
-          <li>▶ Captain Marvel - 78 views</li>
-        </ul>
-      </div>
-    </div>
-  </main>
+<header>
+  <div><img src="https://upload.wikimedia.org/wikipedia/commons/b/b8/YouTube_Studio_logo.svg" alt="Studio" height="30"></div>
+  <div><img src="https://yt3.googleusercontent.com/ytc/AIdro_mo2p3JqvSmN5KTyV_aaDp9XUoOpnlAyZfLCc=s88-c-k-c0x00ffffff-no-rj" alt="User" height="32" style="border-radius: 50%;"></div>
+</header>
+
+<div class="channel-info">
+  <img src="https://yt3.googleusercontent.com/ytc/AIdro_mo2p3JqvSmN5KTyV_aaDp9XUoOpnlAyZfLCc=s88-c-k-c0x00ffffff-no-rj" alt="">
+  <h2>Saju Bhai 2.0</h2>
+  <p style="color: #aaa;">3 subscribers</p>
+</div>
+
+<div class="analytics">
+  <div><strong>740</strong><br><span style="color: #aaa;">Views</span></div>
+  <div><strong>1.0</strong><br><span style="color: #aaa;">Watch time</span></div>
+</div>
+
+<div class="video-list">
+  <div class="video-card">
+    <img src="https://i.ytimg.com/vi/5To0cZTC-rU/mqdefault.jpg" alt="video">
+    <div class="video-title">🤣🤣🤣🤣 #freefire #fff...</div>
+    <div class="stats">623 views • 7 likes • 0 comments</div>
+  </div>
+
+  <div class="video-card">
+    <img src="https://i.ytimg.com/vi/XYZ123/mqdefault.jpg" alt="video">
+    <div class="video-title">🤣🤣🤣🤣🤣</div>
+    <div class="stats">17 views • 0 likes • 0 comments</div>
+  </div>
+
+  <div class="video-card">
+    <img src="https://i.ytimg.com/vi/ABC456/mqdefault.jpg" alt="video">
+    <div class="video-title">না দেখলে মিস করবেন 🤣🤣</div>
+    <div class="stats">6 views • 0 likes • 0 comments</div>
+  </div>
+</div>
+
+<footer>
+  <div class="active">Dashboard</div>
+  <div>Content</div>
+  <div>Analytics</div>
+  <div>Community</div>
+  <div>Earn</div>
+</footer>
+
 </body>
 </html>
