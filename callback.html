@@ -2,20 +2,44 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Redirecting...</title>
+  <title>Authenticating...</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #121212;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .loader {
+      text-align: center;
+    }
+    .loader p {
+      font-size: 1.2rem;
+      margin-top: 1rem;
+    }
+  </style>
 </head>
-<body style="background:#000;color:#fff;text-align:center;font-family:sans-serif;">
-  <h2>🔐 Authenticating with YouTube...</h2>
+<body>
+  <div class="loader">
+    <div class="spinner"></div>
+    <p>Authenticating with YouTube. Please wait...</p>
+  </div>
+
   <script>
-    const hash = window.location.hash.substr(1);
-    const params = new URLSearchParams(hash);
-    const accessToken = params.get("access_token");
+    // Extract access token from URL fragment
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = hashParams.get('access_token');
 
     if (accessToken) {
-      localStorage.setItem("access_token", accessToken);
-      window.location.href = "/cms.html";
+      // Store token in localStorage
+      localStorage.setItem('yt_access_token', accessToken);
+      // Redirect to CMS dashboard
+      window.location.href = 'cms.html';
     } else {
-      document.body.innerHTML = "<h2>❌ Failed to authenticate.</h2>";
+      document.body.innerHTML = "<h2 style='color:red'>Error: Access Token not found!</h2>";
     }
   </script>
 </body>
