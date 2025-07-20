@@ -1,27 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>OAuth Callback</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Authenticating...</title>
+  <style>
+    body {
+      background: #0f0f0f;
+      color: white;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-size: 1.2rem;
+    }
+  </style>
 </head>
 <body>
+  Please wait, redirecting...
   <script>
+    // Extract token from hash fragment
     const hash = window.location.hash.substring(1);
     const params = new URLSearchParams(hash);
     const accessToken = params.get("access_token");
-
+    const expiresIn = params.get("expires_in");
+    const tokenType = params.get("token_type");
+    
     if (accessToken) {
-      fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
-        headers: {
-          Authorization: "Bearer " + accessToken
-        }
-      })
-      .then(res => res.json())
-      .then(data => {
-        localStorage.setItem("user", JSON.stringify(data));
-        window.location.href = "/";
-      });
+      // Store token in localStorage (optional)
+      localStorage.setItem("access_token", accessToken);
+      localStorage.setItem("token_type", tokenType);
+      localStorage.setItem("expires_in", expiresIn);
+
+      // Redirect to cms.html with token in query (optional)
+      window.location.href = `/cms.html?token=${accessToken}`;
     } else {
-      document.body.innerText = "Login failed.";
+      document.body.innerHTML = "Failed to authenticate. Please try again.";
     }
   </script>
 </body>
