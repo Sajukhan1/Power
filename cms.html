@@ -1,163 +1,128 @@
+<!-- cms.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube Studio - CMS</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-  <script src="https://kit.fontawesome.com/4e7f28bd9b.js" crossorigin="anonymous"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YouTube Studio Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
+    * {
+      box-sizing: border-box;
       font-family: 'Roboto', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    body {
       display: flex;
-      height: 100vh;
-      background: #121212;
-      color: white;
-    }
-
-    aside {
-      width: 220px;
-      background: #1f1f1f;
-      padding: 20px;
-      position: fixed;
-      height: 100%;
-    }
-
-    aside h2 {
-      font-size: 22px;
-      margin-bottom: 30px;
-      display: flex;
-      align-items: center;
-    }
-
-    aside h2 i {
-      margin-right: 10px;
-      color: red;
-    }
-
-    .menu-item {
-      margin-bottom: 15px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      transition: background 0.2s;
-    }
-
-    .menu-item i {
-      margin-right: 10px;
-      width: 20px;
-      text-align: center;
-    }
-
-    .menu-item:hover {
-      background: #333;
-      padding: 5px 10px;
-      border-radius: 5px;
-    }
-
-    .submenu {
-      display: none;
-      margin-left: 30px;
-      margin-top: 5px;
-    }
-
-    .submenu-item {
-      margin-bottom: 10px;
-      cursor: pointer;
-    }
-
-    .submenu-item:hover {
-      text-decoration: underline;
-    }
-
-    .active .submenu {
-      display: block;
-    }
-
-    main {
-      margin-left: 240px;
-      padding: 20px;
-      flex: 1;
+      min-height: 100vh;
       background: #181818;
+      color: #fff;
     }
-
-    .video-grid {
+    .sidebar {
+      width: 220px;
+      background-color: #202020;
+      padding: 1rem 0.5rem;
       display: flex;
-      flex-wrap: wrap;
-      gap: 20px;
+      flex-direction: column;
     }
-
-    .video-card {
-      width: 200px;
-      background: #2a2a2a;
+    .sidebar h2 {
+      font-size: 1.2rem;
+      padding: 1rem;
+    }
+    .sidebar a {
+      color: #fff;
+      padding: 0.8rem 1rem;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: background 0.2s ease;
+    }
+    .sidebar a:hover {
+      background: #383838;
+    }
+    .main {
+      flex: 1;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+    }
+    .card {
+      background-color: #252525;
       border-radius: 8px;
-      overflow: hidden;
+      padding: 1rem;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
     }
-
-    .video-card img {
+    .card h3 {
+      font-size: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .video-thumb {
       width: 100%;
-      height: 120px;
-      object-fit: cover;
+      border-radius: 6px;
+      margin-top: 0.5rem;
     }
-
+    .analytics p {
+      font-size: 0.9rem;
+      margin: 0.3rem 0;
+    }
+    .header {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
     @media (max-width: 768px) {
-      aside { width: 180px; }
-      main { margin-left: 200px; }
-    }
-
-    @media (max-width: 500px) {
-      aside { display: none; }
-      main { margin-left: 0; }
+      .sidebar {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
+  <aside class="sidebar">
+    <h2>📺 Studio</h2>
+    <a href="#"><span>🏠</span> Dashboard</a>
+    <a href="#"><span>📁</span> Content</a>
+    <a href="#"><span>📊</span> Analytics</a>
+    <a href="#"><span>💬</span> Comments</a>
+    <a href="#"><span>💰</span> Monetization</a>
+    <a href="#"><span>⚙️</span> Settings</a>
+  </aside>
 
-<aside>
-  <h2><i class="fas fa-play-circle"></i>Studio</h2>
-
-  <div class="menu-item"><i class="fas fa-home"></i> Dashboard</div>
-  <div class="menu-item"><i class="fas fa-video"></i> Content</div>
-
-  <div class="menu-item" id="analyticsToggle">
-    <i class="fas fa-chart-line"></i> Analytics <i class="fas fa-caret-down" style="margin-left:auto;"></i>
-  </div>
-  <div class="submenu" id="analyticsSubmenu">
-    <div class="submenu-item">Overview</div>
-    <div class="submenu-item">Reach</div>
-    <div class="submenu-item">Engagement</div>
-  </div>
-
-  <div class="menu-item"><i class="fas fa-comments"></i> Comments</div>
-  <div class="menu-item"><i class="fas fa-dollar-sign"></i> Monetization</div>
-  <div class="menu-item"><i class="fas fa-cog"></i> Settings</div>
-</aside>
-
-<main>
-  <h2>Videos</h2>
-  <div class="video-grid">
-    <div class="video-card">
-      <img src="https://i.ytimg.com/vi/pU8-7BX9uxs/maxresdefault.jpg" alt="Video">
+  <main class="main">
+    <div class="header">Channel Dashboard</div>
+    <div class="grid">
+      <div class="card">
+        <h3>Latest Video Performance</h3>
+        <img class="video-thumb" src="https://img.youtube.com/vi/5To0cZTC-rU/mqdefault.jpg" alt="Latest Video">
+        <p>Views: 623</p>
+        <p>Likes: 7</p>
+        <p>Watch time: 95%</p>
+      </div>
+      <div class="card">
+        <h3>Important Notifications</h3>
+        <p>🚫 One video is blocked in some countries.</p>
+        <button style="margin-top:10px;padding:6px 12px;background:#ff4d4d;border:none;border-radius:4px;color:#fff;">View Options</button>
+      </div>
+      <div class="card analytics">
+        <h3>Channel Analytics</h3>
+        <p>Subscribers: 3</p>
+        <p>Views (28 days): 740</p>
+        <p>Watch time: 1.0 hours</p>
+      </div>
+      <div class="card">
+        <h3>Top Videos</h3>
+        <ul style="list-style:none;margin-top:0.5rem;">
+          <li>▶ Phulki 16 July 2025 - 0 views</li>
+          <li>▶ Avengers Trailer - 153 views</li>
+          <li>▶ Captain Marvel - 78 views</li>
+        </ul>
+      </div>
     </div>
-    <div class="video-card">
-      <img src="https://i.ytimg.com/vi/6ZfuNTqbHE8/maxresdefault.jpg" alt="Video">
-    </div>
-    <div class="video-card">
-      <img src="https://i.ytimg.com/vi/Z1BCujX3pw8/maxresdefault.jpg" alt="Video">
-    </div>
-  </div>
-</main>
-
-<script>
-  const toggle = document.getElementById('analyticsToggle');
-  const submenu = document.getElementById('analyticsSubmenu');
-
-  toggle.addEventListener('click', () => {
-    submenu.classList.toggle('active');
-    toggle.classList.toggle('active');
-  });
-</script>
-
+  </main>
 </body>
 </html>
