@@ -2,55 +2,59 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login with YouTube</title>
+  <title>YouTube Rights Login</title>
   <style>
     body {
-      background: #000;
-      color: #fff;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      background: #0f0f0f;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    .login-box {
+      background: #1e1e1e;
+      padding: 30px;
+      border-radius: 15px;
+      display: inline-block;
+      box-shadow: 0 0 10px #03A9F4;
     }
     h1 {
-      background: linear-gradient(to right, #00f260, #0575e6);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-size: 36px;
-      margin-bottom: 20px;
+      font-size: 28px;
+      color: #03A9F4;
     }
-    .login-btn {
-      background: linear-gradient(to right, #ff416c, #ff4b2b);
+    .btn {
+      background: #03A9F4;
+      padding: 12px 25px;
       border: none;
-      padding: 14px 28px;
-      font-size: 18px;
+      color: black;
+      font-weight: bold;
       border-radius: 8px;
-      color: white;
       cursor: pointer;
-      transition: 0.3s ease;
-    }
-    .login-btn:hover {
-      transform: scale(1.05);
+      font-size: 16px;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
-  <h1>YouTube Rights Management</h1>
-  <button class="login-btn" onclick="login()">🎬 Login with Google</button>
+  <div class="login-box">
+    <h1>🎥 YouTube Rights Login</h1>
+    <button class="btn" onclick="login()">Login with Google</button>
+  </div>
 
   <script>
     function login() {
-      const clientId = '85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com';
-      const redirectUri = 'https://saju-live.vercel.app/callback.html';
-      const scope = [
-        'https://www.googleapis.com/auth/youtube',
-        'https://www.googleapis.com/auth/youtube.force-ssl',
-        'https://www.googleapis.com/auth/youtubepartner',
-        'https://www.googleapis.com/auth/youtubepartner-channel-audit'
-      ].join(' ');
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=token&client_id=${clientId}&redirect_uri=${redirectUri}&scope=${encodeURIComponent(scope)}&include_granted_scopes=true`;
+      const clientId = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
+      const redirectUri = "https://saju-live.vercel.app/callback.html";
+      const scopes = [
+        "https://www.googleapis.com/auth/youtube.force-ssl",
+        "https://www.googleapis.com/auth/youtube",
+        "https://www.googleapis.com/auth/youtubepartner",
+        "https://www.googleapis.com/auth/youtubepartner-channel-audit",
+        "https://www.googleapis.com/auth/youtube.readonly",
+        "https://www.googleapis.com/auth/youtube.upload"
+      ].join(" ");
+      
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${encodeURIComponent(scopes)}&include_granted_scopes=true`;
 
       window.location.href = authUrl;
     }
