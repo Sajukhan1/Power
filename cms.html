@@ -1,88 +1,101 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Rights Management</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: "Roboto", sans-serif;
       background-color: #0f0f0f;
       color: white;
       margin: 0;
       padding: 0;
     }
+
     .container {
-      max-width: 700px;
-      margin: auto;
-      padding: 2rem;
-    }
-    h2 {
-      font-size: 1.8rem;
-      font-weight: bold;
-      margin-bottom: 1rem;
-      color: #ffffff;
-    }
-    .step-nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 2rem;
-    }
-    .step-nav span {
-      background: #1f1f1f;
-      padding: 8px 12px;
-      border-radius: 5px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .panel {
-      background: #1c1c1c;
-      padding: 1.5rem;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 24px;
+      background-color: #181818;
       border-radius: 8px;
     }
+
+    h2 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .tab-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .tab {
+      padding: 10px 16px;
+      background-color: #272727;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .tab.active {
+      background-color: #3ea6ff;
+      font-weight: bold;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
     label {
       display: block;
-      margin-top: 1rem;
-      font-weight: bold;
-      margin-bottom: 0.5rem;
+      margin: 8px 0 4px;
     }
-    select, input[type="text"] {
+
+    select, input[type="text"], textarea {
       width: 100%;
-      padding: 8px;
+      padding: 10px;
+      font-size: 14px;
       border-radius: 4px;
       border: none;
-      font-size: 14px;
-      background: #333;
+      margin-bottom: 16px;
+      background: #303030;
       color: white;
     }
+
     .radio-group {
       display: flex;
       gap: 20px;
-      margin-top: 10px;
+      margin-bottom: 16px;
     }
+
     .radio-group label {
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-weight: normal;
+      gap: 6px;
     }
-    .actions {
-      margin-top: 2rem;
-      display: flex;
-      justify-content: space-between;
-    }
+
     button {
-      padding: 8px 16px;
-      background: #0a84ff;
+      padding: 10px 20px;
       border: none;
-      border-radius: 4px;
-      color: white;
+      background-color: #3ea6ff;
+      color: black;
       font-weight: bold;
+      border-radius: 4px;
       cursor: pointer;
     }
+
     button:hover {
-      background: #006be2;
+      background-color: #60b5ff;
     }
   </style>
 </head>
@@ -90,38 +103,104 @@
   <div class="container">
     <h2>Rights Management</h2>
 
-    <div class="step-nav">
-      <span>Details</span>
-      <span>Rights man..</span>
-      <span>Monetization</span>
-      <span>Ad suitability</span>
-      <span>Video elements</span>
-      <span>Checks</span>
-      <span>Visibility</span>
+    <div class="tab-bar">
+      <button class="tab active" onclick="showTab('details')">Details</button>
+      <button class="tab" onclick="showTab('rights')">Rights man..</button>
+      <button class="tab" onclick="showTab('monetization')">Monetization</button>
+      <button class="tab" onclick="showTab('ad')">Ad suitability</button>
+      <button class="tab" onclick="showTab('elements')">Video elements</button>
+      <button class="tab" onclick="showTab('checks')">Checks</button>
+      <button class="tab" onclick="showTab('visibility')">Visibility</button>
     </div>
 
-    <div class="panel">
-      <label for="uploadPolicy">Upload Policy</label>
-      <select id="uploadPolicy">
-        <option value="monetize_all">Monetize in all countries</option>
-        <option value="block_all">Block in all countries</option>
-        <option value="track_all">Track in all countries</option>
+    <!-- Details Tab -->
+    <div class="tab-content active" id="details">
+      <label>Video Title</label>
+      <input type="text" placeholder="Enter title"/>
+
+      <label>Description</label>
+      <textarea placeholder="Enter description..."></textarea>
+    </div>
+
+    <!-- Rights Management Tab -->
+    <div class="tab-content" id="rights">
+      <label>Upload Policy</label>
+      <select>
+        <option value="monetize">Monetize in all countries</option>
+        <option value="block">Block in all countries</option>
+        <option value="track">Track views worldwide</option>
       </select>
 
       <label>Ownership</label>
       <div class="radio-group">
         <label><input type="radio" name="ownership" value="global" checked /> Global</label>
-        <label><input type="radio" name="ownership" value="territories" /> Specific territories</label>
+        <label><input type="radio" name="ownership" value="specific" /> Specific territories</label>
       </div>
 
-      <label for="assetInfo">Asset Information</label>
-      <input type="text" id="assetInfo" placeholder="Enter asset ID or note..." />
+      <label>Asset Notes</label>
+      <input type="text" placeholder="Enter asset info" />
+    </div>
 
-      <div class="actions">
-        <button id="back">Back</button>
-        <button id="next">Next</button>
+    <!-- Monetization Tab -->
+    <div class="tab-content" id="monetization">
+      <label>Is this video monetized?</label>
+      <div class="radio-group">
+        <label><input type="radio" name="monetized" value="yes" /> Yes</label>
+        <label><input type="radio" name="monetized" value="no" /> No</label>
       </div>
     </div>
+
+    <!-- Ad suitability Tab -->
+    <div class="tab-content" id="ad">
+      <label>Content Rating</label>
+      <select>
+        <option value="G">G - General</option>
+        <option value="PG">PG</option>
+        <option value="18+">18+</option>
+      </select>
+    </div>
+
+    <!-- Video elements Tab -->
+    <div class="tab-content" id="elements">
+      <label>End Screen</label>
+      <input type="text" placeholder="Enter end screen video ID"/>
+    </div>
+
+    <!-- Checks Tab -->
+    <div class="tab-content" id="checks">
+      <p>No copyright issues found.</p>
+    </div>
+
+    <!-- Visibility Tab -->
+    <div class="tab-content" id="visibility">
+      <label>Who can see this video?</label>
+      <select>
+        <option value="public">Public</option>
+        <option value="unlisted">Unlisted</option>
+        <option value="private">Private</option>
+      </select>
+    </div>
+
+    <br/>
+    <button onclick="saveAll()">Save Settings</button>
   </div>
+
+  <script>
+    function showTab(tabId) {
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-content').forEach(content => {
+        content.classList.remove('active');
+      });
+
+      document.getElementById(tabId).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    function saveAll() {
+      alert("All settings saved (demo)");
+    }
+  </script>
 </body>
 </html>
