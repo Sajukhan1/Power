@@ -4,175 +4,172 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>YouTube Rights Management Studio</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
   <style>
     body {
-      background-color: #0f0f0f;
-      color: #fff;
       font-family: 'Roboto', sans-serif;
-      padding: 20px;
+      background-color: #121212;
+      color: #fff;
+      margin: 0;
+      padding: 0;
     }
 
-    h1 {
-      font-size: 24px;
-      color: #00b4ff;
+    .header {
+      padding: 16px;
+      font-size: 22px;
+      background-color: #202020;
+      border-bottom: 1px solid #444;
+      text-align: center;
     }
 
     .video-card {
       background: #1f1f1f;
-      border: 1px solid #333;
-      border-radius: 12px;
-      margin: 15px 0;
-      padding: 15px;
+      border-radius: 10px;
+      margin: 20px auto;
+      padding: 20px;
+      max-width: 700px;
       box-shadow: 0 0 10px #000;
-      transition: 0.3s;
     }
 
-    .video-card:hover {
-      transform: scale(1.02);
-    }
-
-    iframe {
-      width: 100%;
-      max-width: 500px;
-      height: 280px;
-      border-radius: 8px;
-    }
-
-    label {
-      font-weight: bold;
-      display: block;
-      margin-top: 10px;
-    }
-
-    select, input[type="text"] {
-      width: 100%;
-      background: #111;
-      color: #fff;
-      border: 1px solid #444;
-      border-radius: 5px;
-      padding: 8px;
-      margin-top: 5px;
+    .video-title {
+      font-size: 20px;
+      margin: 10px 0;
     }
 
     .btn {
-      background-color: #00b4ff;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 5px;
+      background: #0f9d58;
       color: white;
-      margin-top: 10px;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 5px;
       cursor: pointer;
     }
 
     .btn:hover {
-      background-color: #0099cc;
+      background: #0b7c44;
     }
 
-    .status {
-      color: #00ff99;
+    .popup {
+      display: none;
+      position: fixed;
+      top: 5%;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #282828;
+      border: 1px solid #444;
+      border-radius: 10px;
+      padding: 25px;
+      width: 90%;
+      max-width: 800px;
+      z-index: 9999;
+    }
+
+    .popup h2 {
+      margin-top: 0;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
       font-weight: bold;
-      margin-top: 5px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: none;
+      background-color: #333;
+      color: white;
+    }
+
+    .tab-header {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .tab-header div {
+      padding: 10px 20px;
+      background-color: #2e2e2e;
+      margin-right: 8px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .tab-header div.active {
+      background-color: #0f9d58;
+    }
+
+    .close-btn {
+      float: right;
+      background: red;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
 
-  <h1>📺 YouTube Rights Management Studio</h1>
+  <div class="header">🎬 YouTube Rights Management Studio</div>
 
-  <div id="videoContainer"></div>
+  <div class="video-card">
+    <div class="video-title">Phulki 16 July 2025 Full Episode</div>
+    <button class="btn" onclick="openPopup()">Edit Rights</button>
+  </div>
+
+  <div id="rightsPopup" class="popup">
+    <button class="close-btn" onclick="closePopup()">X</button>
+    <h2>Rights Management</h2>
+
+    <div class="tab-header">
+      <div class="active">Details</div>
+      <div>Rights man..</div>
+      <div>Monetization</div>
+      <div>Ad suitability</div>
+      <div>Video elements</div>
+      <div>Checks</div>
+      <div>Visibility</div>
+    </div>
+
+    <div class="form-group">
+      <label for="uploadPolicy">Upload Policy</label>
+      <select id="uploadPolicy">
+        <option value="monetize_all">Monetize in all countries</option>
+        <option value="block_some">Block in some regions</option>
+        <option value="track">Track views</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Ownership</label>
+      <input type="radio" name="ownership" value="global" checked> Global<br>
+      <input type="radio" name="ownership" value="territories"> Specific territories
+    </div>
+
+    <div class="form-group">
+      <label for="assetInfo">Asset Information</label>
+      <input type="text" id="assetInfo" placeholder="Enter asset ID or note...">
+    </div>
+
+    <button class="btn" onclick="alert('Saved Successfully!')">Save</button>
+  </div>
 
   <script>
-    const accessToken = localStorage.getItem('yt_token');
-
-    async function fetchVideos() {
-      const res = await fetch('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,status&mine=true&maxResults=10', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      });
-      const data = await res.json();
-      return data.items || [];
+    function openPopup() {
+      document.getElementById("rightsPopup").style.display = "block";
     }
 
-    function createCard(video) {
-      const container = document.createElement("div");
-      container.className = "video-card";
-
-      const iframe = document.createElement("iframe");
-      iframe.src = `https://www.youtube.com/embed/${video.id}`;
-      iframe.allowFullscreen = true;
-
-      const title = document.createElement("h3");
-      title.textContent = video.snippet.title;
-
-      const uploadPolicyLabel = document.createElement("label");
-      uploadPolicyLabel.textContent = "Upload Policy";
-
-      const uploadPolicy = document.createElement("select");
-      ["Monetize", "Track", "Block"].forEach(policy => {
-        const option = document.createElement("option");
-        option.value = policy.toLowerCase();
-        option.textContent = policy;
-        uploadPolicy.appendChild(option);
-      });
-
-      const ownershipLabel = document.createElement("label");
-      ownershipLabel.textContent = "Ownership";
-
-      const ownership = document.createElement("select");
-      ["Global", "Specific Territories"].forEach(val => {
-        const option = document.createElement("option");
-        option.value = val.toLowerCase();
-        option.textContent = val;
-        ownership.appendChild(option);
-      });
-
-      const assetInfoLabel = document.createElement("label");
-      assetInfoLabel.textContent = "Asset Info";
-
-      const assetInput = document.createElement("input");
-      assetInput.type = "text";
-      assetInput.placeholder = "Enter asset notes or ID...";
-
-      const preview = document.createElement("div");
-      preview.className = "status";
-      preview.textContent = "💡 Policy: Monetize - Worldwide";
-
-      const btn = document.createElement("button");
-      btn.className = "btn";
-      btn.textContent = "Apply Rights";
-      btn.onclick = () => {
-        preview.textContent = `✅ Applied: ${uploadPolicy.value} - ${ownership.value}`;
-        alert(`Applied to ${video.snippet.title}`);
-      };
-
-      container.appendChild(iframe);
-      container.appendChild(title);
-      container.appendChild(uploadPolicyLabel);
-      container.appendChild(uploadPolicy);
-      container.appendChild(ownershipLabel);
-      container.appendChild(ownership);
-      container.appendChild(assetInfoLabel);
-      container.appendChild(assetInput);
-      container.appendChild(preview);
-      container.appendChild(btn);
-
-      document.getElementById("videoContainer").appendChild(container);
+    function closePopup() {
+      document.getElementById("rightsPopup").style.display = "none";
     }
-
-    async function init() {
-      if (!accessToken) {
-        alert("No access token found. Please login again.");
-        window.location.href = "/index.html";
-        return;
-      }
-
-      const videos = await fetchVideos();
-      videos.forEach(createCard);
-    }
-
-    init();
   </script>
+
 </body>
 </html>
