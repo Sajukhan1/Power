@@ -1,72 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>YouTube CMS Panel</title>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <title>YouTube Content Manager</title>
   <style>
     body {
+      font-family: Arial, sans-serif;
+      background: #121212;
+      color: #fff;
       margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: #0f0f0f;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 2rem;
+      padding: 20px;
     }
-    .header {
-      font-size: 1.8rem;
-      color: #f1c40f;
-      margin-bottom: 1rem;
+    h1 {
+      color: #ffcc00;
+      margin-bottom: 20px;
     }
-    .token-info {
+    #video-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .video-card {
       background: #1f1f1f;
-      padding: 1rem;
-      border-radius: 8px;
-      width: 100%;
-      max-width: 600px;
-      word-break: break-all;
-      margin-top: 1rem;
-      box-shadow: 0 0 10px rgba(255,255,255,0.05);
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
-    .welcome {
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
+    .video-card h3 {
+      font-size: 16px;
+      margin: 10px 0;
+    }
+    .thumbnail {
+      width: 100%;
+      border-radius: 6px;
+    }
+    .geo-btn {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background-color: #ff3e3e;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .geo-btn:hover {
+      background-color: #ff1e1e;
     }
   </style>
 </head>
 <body>
-  <div class="header">🎬 YouTube CMS Dashboard</div>
-  <div class="welcome" id="welcome">Loading user info...</div>
-  <div class="token-info" id="token-info">Access token not found.</div>
+
+  <h1>YouTube Content Manager</h1>
+  <div id="video-list">Loading...</div>
 
   <script>
-    const accessToken = localStorage.getItem('access_token');
+    // Step 1: Get token from localStorage or URL fragment
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const token = hashParams.get("access_token") || localStorage.getItem("yt_token");
 
-    if (!accessToken) {
-      document.getElementById('token-info').innerText = 'No access token found. Please login again.';
-      window.location.href = 'index.html';
+    if (token) {
+      localStorage.setItem("yt_token", token);
+      fetchVideos(token);
     } else {
-      document.getElementById('token-info').innerText = "Access Token:\n" + accessToken;
+      document.getElementById("video-list").innerText = "No access token found. Please login again.";
+    }
 
-      fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-        headers: {
-          Authorization: 'Bearer ' + accessToken
+    // Step 2: Fetch video list
+    async function fetchVideos(token) {
+      try {
+        const res = await fetch("https://www.googleapis.com/youtube/v3/videos?part=snippet&mine=true&maxResults=10", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        const data = await res.json();
+        const container = document.getElementById("video-list");
+        container.innerHTML = '';
+
+        if (!data.items || data.items.length === 0) {
+          container.innerHTML = '<p>No videos found.</p>';
+          return;
         }
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.name) {
-          document.getElementById('welcome').innerText = `Welcome, ${data.name}`;
-        } else {
-          document.getElementById('welcome').innerText = 'Welcome, User';
-        }
-      })
-      .catch(err => {
-        document.getElementById('welcome').innerText = 'Failed to fetch user info';
-      });
+
+        data.items.forEach(video => {
+          const { title, thumbnails } = video.snippet;
+          const id = video.id;
+
+          const div = document.createElement("div");
+          div.className = "video-card";
+          div.innerHTML = `
+            <img src="${thumbnails.medium.url}" class="thumbnail" />
+            <h3>${title}</h3>
+            <button class="geo-btn" onclick="applyGeo('${id}')">Apply Geo Restriction</button>
+          `;
+          container.appendChild(div);
+        });
+      } catch (err) {
+        console.error(err);
+        document.getElementById("video-list").innerText = "Failed to fetch videos.";
+      }
+    }
+
+    // Step 3: Placeholder Geo Restriction function
+    function applyGeo(videoId) {
+      alert(`Geo Restriction will be applied to Video ID: ${videoId}`);
+      // TODO: Add fetch call to backend API to update regionRestriction (BD only)
     }
   </script>
 </body>
