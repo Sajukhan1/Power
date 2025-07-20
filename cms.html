@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube CMS Panel</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: #0f0f0f;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+    .header {
+      font-size: 1.8rem;
+      color: #f1c40f;
+      margin-bottom: 1rem;
+    }
+    .token-info {
+      background: #1f1f1f;
+      padding: 1rem;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 600px;
+      word-break: break-all;
+      margin-top: 1rem;
+      box-shadow: 0 0 10px rgba(255,255,255,0.05);
+    }
+    .welcome {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">🎬 YouTube CMS Dashboard</div>
+  <div class="welcome" id="welcome">Loading user info...</div>
+  <div class="token-info" id="token-info">Access token not found.</div>
+
+  <script>
+    const accessToken = localStorage.getItem('access_token');
+
+    if (!accessToken) {
+      document.getElementById('token-info').innerText = 'No access token found. Please login again.';
+      window.location.href = 'index.html';
+    } else {
+      document.getElementById('token-info').innerText = "Access Token:\n" + accessToken;
+
+      fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+        headers: {
+          Authorization: 'Bearer ' + accessToken
+        }
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.name) {
+          document.getElementById('welcome').innerText = `Welcome, ${data.name}`;
+        } else {
+          document.getElementById('welcome').innerText = 'Welcome, User';
+        }
+      })
+      .catch(err => {
+        document.getElementById('welcome').innerText = 'Failed to fetch user info';
+      });
+    }
+  </script>
+</body>
+</html>
