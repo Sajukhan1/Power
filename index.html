@@ -68,19 +68,38 @@ const SCOPES = [
   'https://www.googleapis.com/auth/youtube.channel-memberships.creator'
 ].join(' ');
 
+// Save token globally
 let token = null;
 
-document.getElementById('loginBtn').onclick = () => {
-  const redirectUri = window.location.href.split('#')[0];
-  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=${encodeURIComponent(SCOPES)}&include_granted_scopes=true`;
+// Auto-refresh token before expiry (simulated with timer)
+function setTokenRefreshTimer(expires_in_sec = 3300) {
+  setTimeout(() => {
+    console.log('🔁 Token expired or near expiry. Logging in again...');
+    startAuth();
+  }, expires_in_sec * 1000); // default 55 minutes
+}
+
+// Start OAuth flow
+function startAuth() {
+  const redirectUri = window.location.origin + window.location.pathname;
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=${encodeURIComponent(SCOPES)}&include_granted_scopes=true&prompt=consent`;
   window.location.href = authUrl;
+}
+
+// On login button click
+document.getElementById('loginBtn').onclick = () => {
+  startAuth();
 };
 
+// On page load
 window.onload = () => {
   const hash = window.location.hash;
   if (hash.includes('access_token')) {
     const params = new URLSearchParams(hash.substring(1));
     token = params.get('access_token');
+    const expiresIn = parseInt(params.get('expires_in')) || 3600;
+    setTokenRefreshTimer(expiresIn - 300); // refresh 5 min before expiry
+    window.history.replaceState({}, document.title, window.location.pathname); // remove token from URL
     document.getElementById('status').innerHTML = '✅ Logged in with YouTube';
     document.getElementById('loginBtn').style.display = 'none';
     loadVideos();
@@ -89,16 +108,16 @@ window.onload = () => {
   }
 };
 
+// Load videos from authenticated user's channel
 function loadVideos() {
-  // Step 1: Get uploads playlist ID
   fetch('https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true', {
     headers: { Authorization: `Bearer ${token}` }
   })
   .then(res => res.json())
   .then(data => {
-    if (!data.items || data.items.length === 0) throw new Error("No channel found.");
+    if (!data.items || data.items.length === 0) throw new Error("❌ No channel found.");
     const uploadsPlaylistId = data.items[0].contentDetails.relatedPlaylists.uploads;
-    // Step 2: Get videos from uploads playlist
+
     return fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=20`, {
       headers: { Authorization: `Bearer ${token}` }
     });
