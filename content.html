@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Edit Video – YouTube CMS</title>
+  <title>Video Rights Management</title>
   <style>
     body {
       font-family: Roboto, Arial, sans-serif;
@@ -12,12 +12,12 @@
       padding: 20px;
     }
     .container {
-      max-width: 900px;
+      max-width: 960px;
       margin: auto;
       background: white;
       padding: 30px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
       border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     }
     h2 {
       margin-top: 0;
@@ -27,14 +27,17 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: 30px;
+      overflow-x: auto;
     }
     .step {
       flex: 1;
+      min-width: 100px;
       text-align: center;
       padding: 10px;
       border-bottom: 2px solid #ccc;
       font-size: 14px;
       color: #666;
+      white-space: nowrap;
     }
     .step.active {
       font-weight: bold;
@@ -60,10 +63,12 @@
     }
     .row {
       display: flex;
+      flex-wrap: wrap;
       gap: 20px;
     }
     .row > div {
       flex: 1;
+      min-width: 200px;
     }
     .footer {
       text-align: right;
@@ -81,15 +86,22 @@
     .footer button:hover {
       background-color: #054ec0;
     }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .row {
+        flex-direction: column;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Edit Video Details</h2>
+    <h2>Edit Video Metadata</h2>
 
     <div class="step-nav">
       <div class="step active">Details</div>
-      <div class="step active">Rights mana…</div>
+      <div class="step active">Rights management</div>
       <div class="step">Monetization</div>
       <div class="step">Ad suitability</div>
       <div class="step">Video elements</div>
@@ -109,24 +121,24 @@
 
       <div class="form-group">
         <label for="assetTitle">Asset title</label>
-        <input type="text" id="assetTitle" required />
+        <input type="text" id="assetTitle" required placeholder="Enter asset title"/>
       </div>
 
       <div class="row">
         <div class="form-group">
           <label for="customId">Custom ID</label>
-          <input type="text" id="customId" />
+          <input type="text" id="customId" placeholder="Optional"/>
         </div>
 
         <div class="form-group">
           <label for="notes">Notes</label>
-          <textarea id="notes" rows="3" placeholder="Add notes"></textarea>
+          <textarea id="notes" rows="3" placeholder="Add notes..."></textarea>
         </div>
       </div>
 
       <div class="form-group">
         <label for="description">Asset description</label>
-        <textarea id="description" rows="4" placeholder="Add asset description"></textarea>
+        <textarea id="description" rows="4" placeholder="Describe the asset..."></textarea>
       </div>
 
       <div class="footer">
@@ -140,14 +152,23 @@
     const videoId = params.get("videoId");
 
     if (!videoId) {
-      alert("Video ID not found in URL.");
+      alert("❌ Video ID not found in URL (missing ?videoId=...)");
     }
 
-    // Later: Load video data via YouTube API
     document.getElementById("videoForm").addEventListener("submit", function (e) {
       e.preventDefault();
-      alert("✅ Video metadata saved for video ID: " + videoId);
-      // Optional: Send data to backend or apply via API
+
+      const data = {
+        videoId: videoId,
+        assetType: document.getElementById("assetType").value,
+        assetTitle: document.getElementById("assetTitle").value,
+        customId: document.getElementById("customId").value,
+        notes: document.getElementById("notes").value,
+        description: document.getElementById("description").value,
+      };
+
+      // ✅ Show alert for now (later you can send to backend)
+      alert("✅ Saved:\n" + JSON.stringify(data, null, 2));
     });
   </script>
 </body>
