@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Monetization Settings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 15px;
+    }
+
+    select, input[type="checkbox"] {
+      margin-top: 8px;
+    }
+
+    .checkbox-group {
+      margin: 15px 0;
+    }
+
+    .checkbox-group label {
+      font-weight: normal;
+    }
+
+    .btn-group {
+      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      background-color: #0f62fe;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0043ce;
+    }
+
+    .step {
+      text-align: right;
+      color: gray;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="step">Step 4 of 7</div>
+    <h2>Monetization</h2>
+
+    <label>
+      <input type="checkbox" id="enableMonetization" />
+      Enable Monetization on this video
+    </label>
+
+    <div id="adOptions" style="display: none;">
+      <div class="checkbox-group">
+        <label><input type="checkbox" /> Display Ads</label><br/>
+        <label><input type="checkbox" /> Overlay Ads</label><br/>
+        <label><input type="checkbox" /> Skippable Video Ads</label><br/>
+        <label><input type="checkbox" /> Non-Skippable Video Ads</label>
+      </div>
+
+      <label for="adBreaks">Ad Break Frequency</label>
+      <select id="adBreaks">
+        <option value="auto">Automatic</option>
+        <option value="manual">Manual</option>
+        <option value="none">No Mid-roll Ads</option>
+      </select>
+    </div>
+
+    <div class="btn-group">
+      <button onclick="goBack()">← Back</button>
+      <button onclick="goNext()">Next →</button>
+    </div>
+  </div>
+
+  <script>
+    const monetizationCheckbox = document.getElementById('enableMonetization');
+    const adOptions = document.getElementById('adOptions');
+
+    monetizationCheckbox.addEventListener('change', () => {
+      adOptions.style.display = monetizationCheckbox.checked ? 'block' : 'none';
+    });
+
+    function goBack() {
+      window.location.href = "geo.html";
+    }
+
+    function goNext() {
+      window.location.href = "adsuitability.html";
+    }
+  </script>
+</body>
+</html>
