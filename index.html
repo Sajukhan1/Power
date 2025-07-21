@@ -3,106 +3,95 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube Studio Login</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+  <title>YouTube Studio - Network Relationship</title>
   <style>
     body {
-      margin: 0;
-      font-family: 'Roboto', sans-serif;
-      background-color: #0f0f0f;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      background-color: #181818;
+      color: #fff;
+      font-family: "Roboto", sans-serif;
+      text-align: center;
+      padding: 50px;
     }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      font-size: 2rem;
-      margin-bottom: 20px;
+    .card {
+      background-color: #212121;
+      border-radius: 10px;
+      padding: 20px;
+      margin: 20px auto;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
-
-    .logo img {
-      height: 40px;
-      margin-right: 10px;
-    }
-
-    .login-btn {
-      background-color: #ff0000;
-      color: white;
-      padding: 14px 30px;
-      font-size: 1.1rem;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    .login-btn:hover {
+    button {
       background-color: #cc0000;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
     }
-
-    .subtitle {
-      margin-top: 10px;
-      font-size: 0.95rem;
-      color: #aaa;
+    button:hover {
+      background-color: #e60000;
     }
-
-    .footer {
-      position: absolute;
-      bottom: 20px;
-      font-size: 0.8rem;
-      color: #555;
+    .info {
+      margin-top: 20px;
+      word-wrap: break-word;
     }
   </style>
 </head>
 <body>
-  <div class="logo">
-    <img src="https://www.gstatic.com/youtube/img/creator/yt_studio_logo_white.svg" alt="YouTube Studio Logo" />
-    <span>YouTube Studio CMS</span>
+  <div class="card">
+    <h1>YouTube Studio - Network Check</h1>
+    <button onclick="login()">Login with Google</button>
+    <div class="info" id="output"></div>
   </div>
 
-  <button class="login-btn" onclick="login()">Login with Google</button>
-
-  <div class="subtitle">Access full rights, monetization, geo-block & content control</div>
-
-  <div class="footer">Developed by Saju — All scopes enabled</div>
-
   <script>
+    const CLIENT_ID = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
+    const REDIRECT_URI = window.location.origin + window.location.pathname; // auto redirect to self
+    const SCOPES = [
+      "https://www.googleapis.com/auth/youtubepartner",
+      "https://www.googleapis.com/auth/youtubepartner-channel-audit",
+      "https://www.googleapis.com/auth/youtube.content-owner.readonly",
+      "https://www.googleapis.com/auth/youtube.rights"
+    ].join(" ");
+
     function login() {
-      const clientId = '85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com';
-      const redirectUri = 'https://saju-live.vercel.app';
-      const scope = [
-        'https://www.googleapis.com/auth/youtube',
-        'https://www.googleapis.com/auth/youtube.force-ssl',
-        'https://www.googleapis.com/auth/youtube.readonly',
-        'https://www.googleapis.com/auth/youtube.upload',
-        'https://www.googleapis.com/auth/youtubepartner',
-        'https://www.googleapis.com/auth/youtubepartner-channel-audit',
-        'https://www.googleapis.com/auth/youtube.channel-memberships.creator',
-        'https://www.googleapis.com/auth/youtube.metadata.readonly',
-        'https://www.googleapis.com/auth/youtube.metadata',
-        'https://www.googleapis.com/auth/youtube.transaction',
-        'https://www.googleapis.com/auth/youtube.rightsmonetization',
-        'https://www.googleapis.com/auth/youtube.reports.metadata.readonly',
-        'https://www.googleapis.com/auth/youtube.reports.readonly',
-        'https://www.googleapis.com/auth/youtubepartner-audit',
-        'https://www.googleapis.com/auth/youtubecontentowner'
-      ].join(' ');
-
-      const url = `https://accounts.google.com/o/oauth2/v2/auth?` +
-        `client_id=${clientId}` +
-        `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-        `&response_type=token` +
-        `&scope=${encodeURIComponent(scope)}` +
-        `&include_granted_scopes=true` +
-        `&prompt=consent`;
-
-      window.location.href = url;
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${encodeURIComponent(SCOPES)}&include_granted_scopes=true`;
+      window.location.href = authUrl;
     }
+
+    async function fetchChannelInfo(token) {
+      const res = await fetch("https://www.googleapis.com/youtube/v3/channels?part=snippet,status&mine=true", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      const data = await res.json();
+      const output = document.getElementById("output");
+
+      if (data.items && data.items.length > 0) {
+        const channel = data.items[0];
+        output.innerHTML = `
+          <h3>✅ Channel Detected</h3>
+          <p><strong>Title:</strong> ${channel.snippet.title}</p>
+          <p><strong>Channel ID:</strong> ${channel.id}</p>
+          <p><strong>Status:</strong> ${channel.status.longUploadsStatus}</p>
+        `;
+      } else {
+        output.innerHTML = "<p>❌ Could not retrieve channel info.</p>";
+      }
+    }
+
+    // Handle access token from URL
+    window.onload = () => {
+      const hash = window.location.hash;
+      if (hash && hash.includes("access_token")) {
+        const token = new URLSearchParams(hash.substring(1)).get("access_token");
+        fetchChannelInfo(token);
+      }
+    };
   </script>
 </body>
 </html>
