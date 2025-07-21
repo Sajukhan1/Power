@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Geo Restriction</title>
+  <style>
+    body {
+      font-family: Roboto, sans-serif;
+      background-color: #f1f3f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    h2 {
+      margin: 0;
+      color: #202124;
+    }
+
+    span.step-count {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .form-section {
+      margin-bottom: 30px;
+    }
+
+    label {
+      font-weight: 500;
+      display: block;
+      margin-bottom: 10px;
+    }
+
+    select, input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-bottom: 15px;
+    }
+
+    .allowed-list {
+      padding: 10px;
+      border: 1px dashed #888;
+      border-radius: 6px;
+      background-color: #f9f9f9;
+      margin-top: 10px;
+    }
+
+    .allowed-list span {
+      background-color: #e3f2fd;
+      color: #0b63ce;
+      padding: 6px 12px;
+      border-radius: 20px;
+      margin: 4px;
+      display: inline-block;
+    }
+
+    .btn-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    button {
+      padding: 10px 25px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-back {
+      background-color: #ccc;
+      color: #333;
+    }
+
+    .btn-next {
+      background-color: #065fd4;
+      color: white;
+    }
+
+    .btn-back:hover {
+      background-color: #bbb;
+    }
+
+    .btn-next:hover {
+      background-color: #054ab8;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="step-header">
+      <h2>Geo Restriction</h2>
+      <span class="step-count">Step 3 of 7</span>
+    </div>
+
+    <div class="form-section">
+      <label for="countrySelect">Allow countries</label>
+      <select id="countrySelect">
+        <option value="BD">Bangladesh</option>
+        <option value="IN">India</option>
+        <option value="US">United States</option>
+        <option value="PK">Pakistan</option>
+        <option value="GB">United Kingdom</option>
+        <option value="CA">Canada</option>
+        <option value="AU">Australia</option>
+        <option value="DE">Germany</option>
+        <option value="FR">France</option>
+        <option value="SA">Saudi Arabia</option>
+        <!-- Add more countries as needed -->
+      </select>
+      <button onclick="addCountry()">Add Country</button>
+
+      <div class="allowed-list" id="allowedCountries">
+        <label>Allowed Countries:</label>
+        <span>Bangladesh</span>
+      </div>
+      <p class="note">All other countries will be blocked by default.</p>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-back" onclick="window.location.href='content.html'">⬅ Back</button>
+      <button class="btn-next" onclick="goToNext()">Next ➤</button>
+    </div>
+  </div>
+
+  <script>
+    const allowedCountries = new Set(["BD"]);
+    const allowedDiv = document.getElementById("allowedCountries");
+
+    const countryNames = {
+      BD: "Bangladesh",
+      IN: "India",
+      US: "United States",
+      PK: "Pakistan",
+      GB: "United Kingdom",
+      CA: "Canada",
+      AU: "Australia",
+      DE: "Germany",
+      FR: "France",
+      SA: "Saudi Arabia"
+    };
+
+    function addCountry() {
+      const select = document.getElementById("countrySelect");
+      const code = select.value;
+      if (!allowedCountries.has(code)) {
+        allowedCountries.add(code);
+        updateAllowedList();
+      }
+    }
+
+    function updateAllowedList() {
+      allowedDiv.innerHTML = `<label>Allowed Countries:</label>`;
+      allowedCountries.forEach(code => {
+        const span = document.createElement("span");
+        span.textContent = countryNames[code] || code;
+        allowedDiv.appendChild(span);
+      });
+    }
+
+    function goToNext() {
+      const allowedList = Array.from(allowedCountries);
+      localStorage.setItem('geoAllowedCountries', JSON.stringify(allowedList));
+      window.location.href = 'monetization.html'; // Step 4 (you can rename)
+    }
+  </script>
+</body>
+</html>
