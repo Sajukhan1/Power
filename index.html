@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>YouTube CMS Dashboard</title>
+  <title>YouTube Rights Dashboard</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -50,10 +50,10 @@
 </head>
 <body>
 
-<h1>YouTube CMS Dashboard</h1>
+<h1>YouTube Rights Dashboard</h1>
 <button id="loginBtn">🔐 Login with Google</button>
 <div id="status"></div>
-<h2>Your Videos</h2>
+<h2>Your Uploaded Videos</h2>
 <div id="videoList">🔄 Loading...</div>
 
 <script>
@@ -78,7 +78,7 @@ function setTokenRefreshTimer(expiry = 3300) {
 }
 
 function startAuth() {
-  const redirectUri = window.location.origin;
+  const redirectUri = window.location.origin + window.location.pathname;
   const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=${encodeURIComponent(SCOPES)}&include_granted_scopes=true&prompt=consent`;
   window.location.href = authUrl;
 }
@@ -128,7 +128,7 @@ function loadVideos() {
       const div = document.createElement('div');
       div.className = 'video-item';
       div.innerHTML = `
-        <span class="edit-icon" onclick="location.href='content.html?videoId=${videoId}'">✏️</span>
+        <span class="edit-icon" onclick="location.href='rights.html?videoId=${videoId}'">✏️</span>
         <strong>${title}</strong><br>
         <iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
       `;
