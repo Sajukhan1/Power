@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Review & Submit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 750px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .step {
+      text-align: right;
+      color: #777;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-bottom: 15px;
+    }
+
+    .summary {
+      background: #f9f9f9;
+      padding: 20px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      margin-bottom: 25px;
+    }
+
+    .summary-item {
+      margin-bottom: 12px;
+    }
+
+    .summary-item strong {
+      display: inline-block;
+      width: 180px;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+
+    button {
+      padding: 12px 25px;
+      font-weight: bold;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+    }
+
+    .back {
+      background-color: #aaa;
+    }
+
+    .submit {
+      background-color: #0f62fe;
+    }
+
+    .submit:hover {
+      background-color: #0043ce;
+    }
+
+    .success-msg {
+      display: none;
+      text-align: center;
+      margin-top: 20px;
+      color: green;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="step">Step 7 of 7</div>
+    <h2>Review & Submit</h2>
+
+    <div class="summary">
+      <div class="summary-item"><strong>Title:</strong> Example Video Title</div>
+      <div class="summary-item"><strong>Description:</strong> Short video description goes here.</div>
+      <div class="summary-item"><strong>Ownership:</strong> Global</div>
+      <div class="summary-item"><strong>Geo Restriction:</strong> Allowed in BD only</div>
+      <div class="summary-item"><strong>Monetization:</strong> Enabled</div>
+      <div class="summary-item"><strong>Ad Suitability:</strong> Safe for all ads</div>
+      <div class="summary-item"><strong>Upload Policy:</strong> Monetize in all countries</div>
+      <div class="summary-item"><strong>Embedding:</strong> Allowed</div>
+    </div>
+
+    <div class="btn-group">
+      <button class="back" onclick="goBack()">← Back</button>
+      <button class="submit" onclick="submitForm()">Submit Rights →</button>
+    </div>
+
+    <div class="success-msg" id="successMsg">✔ Rights submitted successfully!</div>
+  </div>
+
+  <script>
+    function goBack() {
+      window.location.href = "uploadpolicy.html";
+    }
+
+    function submitForm() {
+      document.getElementById("successMsg").style.display = "block";
+
+      // Future use: send data to backend API here
+      // Example: fetch('/api/submit-rights', { method: 'POST', body: JSON.stringify(data) })
+    }
+  </script>
+</body>
+</html>
