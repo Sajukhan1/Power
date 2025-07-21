@@ -1,97 +1,97 @@
-<!-- dashboard.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
+  <title>🎬 YouTube Rights Dashboard</title>
   <meta charset="UTF-8" />
-  <title>YouTube Studio Rights Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      background-color: #0f0f0f;
-      color: #fff;
+      background: #0f0f0f;
+      color: white;
       font-family: 'Segoe UI', sans-serif;
-    }
-    .dashboard-container {
       padding: 30px;
     }
-    .video-card {
-      background-color: #1e1e1e;
-      border: 1px solid #333;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 20px;
-      transition: 0.3s;
-    }
-    .video-card:hover {
-      border-color: #ff0000;
-    }
-    .btn-red {
+    .btn {
       background-color: #ff0000;
-      color: white;
       border: none;
+      padding: 10px 20px;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
     }
-    .btn-red:hover {
+    .btn:hover {
       background-color: #cc0000;
     }
-    .label {
-      font-weight: 500;
-      color: #bbb;
+    .video-card {
+      background-color: #1f1f1f;
+      border: 1px solid #333;
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 30px;
     }
-    .video-title {
-      font-size: 20px;
+    .label {
       font-weight: bold;
+      color: #bbb;
     }
   </style>
 </head>
 <body>
 
-  <div class="dashboard-container container">
-    <h2 class="mb-4">📺 YouTube Studio Rights Dashboard</h2>
+  <h1>🎬 YouTube Rights Management Dashboard</h1>
+  <p>Get real-time data from your YouTube channel.</p>
+  <button class="btn" onclick="login()">🔓 Authorize & Load Data</button>
 
-    <div id="videoList">
-      <!-- Video Block -->
-      <div class="video-card">
-        <div class="d-flex justify-content-between">
-          <div>
-            <p class="video-title">Bagheswari: Chiroshokha 21 July 2025</p>
-            <p><span class="label">Video ID:</span> abc123XYZ</p>
-            <p><span class="label">Views:</span> 18.1K &nbsp;|&nbsp; <span class="label">Likes:</span> 1.2K &nbsp;|&nbsp; <span class="label">Duration:</span> 27:25</p>
-            <p><span class="label">Asset Owner:</span> Bagheswari MCN</p>
-            <p><span class="label">Monetization:</span> ❌ Not via AdSense</p>
-            <p><span class="label">Revenue:</span> ✅ Tracked via Content ID</p>
-            <p><span class="label">Geo Restriction:</span> ✅ Bangladesh Only</p>
-          </div>
-          <div class="d-flex flex-column gap-2">
-            <button class="btn btn-red btn-sm" onclick="editOwnership()">✏️ Edit Ownership</button>
-            <button class="btn btn-red btn-sm" onclick="restrictGeo()">🌍 Apply Restriction</button>
-            <button class="btn btn-red btn-sm" onclick="showRevenue()">💵 Revenue Details</button>
-            <button class="btn btn-outline-light btn-sm" onclick="showAnalytics()">📊 Analytics</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- আরেকটা ভিডিও চাইলে clone করে নিচে paste কর -->
-    </div>
-  </div>
+  <div id="videoContainer"></div>
 
   <script>
-    function editOwnership() {
-      alert("Ownership panel খুলবে। এখানে তুমি MCN, Global, Specific owner দিতে পারো।");
+    const CLIENT_ID = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
+    const SCOPES = "https://www.googleapis.com/auth/youtube.force-ssl";
+    const VIDEO_ID = "abc123XYZ"; // Replace with your actual video ID
+
+    function login() {
+      const popup = window.open(
+        `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=https://oauth.pstmn.io/v1/browser-callback&response_type=token&scope=${SCOPES}&include_granted_scopes=true`,
+        "_blank",
+        "width=500,height=600"
+      );
+
+      const pollTimer = window.setInterval(() => {
+        try {
+          if (popup.location.href.includes("access_token")) {
+            window.clearInterval(pollTimer);
+            const hash = popup.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+            const token = params.get("access_token");
+            popup.close();
+            localStorage.setItem("access_token", token);
+            loadVideoData(token);
+          }
+        } catch (e) {
+          // Cross-origin wait
+        }
+      }, 500);
     }
 
-    function restrictGeo() {
-      alert("Geo Restriction set করা আছে: ✅ Bangladesh Only");
-    }
+    async function loadVideoData(token) {
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${VIDEO_ID}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      const data = await res.json();
+      const v = data.items[0];
 
-    function showRevenue() {
-      alert("Revenue Source: Content ID\nMonetization: No Adsense\nEarnings: $21.45 estimated");
-    }
-
-    function showAnalytics() {
-      alert("Views: 18,100\nWatch Time: 1430 mins\nCTR: 4.5%\nRetention: 52%");
+      document.getElementById("videoContainer").innerHTML = `
+        <div class="video-card">
+          <h3>${v.snippet.title}</h3>
+          <p><span class="label">Views:</span> ${v.statistics.viewCount}</p>
+          <p><span class="label">Likes:</span> ${v.statistics.likeCount}</p>
+          <p><span class="label">Published:</span> ${v.snippet.publishedAt}</p>
+          <p><span class="label">Revenue:</span> ✅ Content ID (MCN)</p>
+          <p><span class="label">Geo Restriction:</span> ✅ Only Bangladesh</p>
+          <p><span class="label">Asset Owner:</span> Bagheswari MCN</p>
+        </div>
+      `;
     }
   </script>
-
 </body>
 </html>
