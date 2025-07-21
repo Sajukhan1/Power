@@ -1,146 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>YouTube Rights Dashboard</title>
   <style>
     body {
+      margin: 0;
       font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      padding: 20px;
+      background: #0f0f0f;
+      color: white;
+    }
+    .container {
+      padding: 2rem;
+      max-width: 900px;
+      margin: auto;
       text-align: center;
     }
-    h1 {
-      color: #c00;
-    }
-    #loginBtn {
-      background: #c00;
+    button {
+      background-color: #ff0000;
       color: white;
       border: none;
-      padding: 10px 20px;
+      padding: 12px 24px;
       font-size: 16px;
-      border-radius: 5px;
       cursor: pointer;
+      border-radius: 5px;
     }
-    .video-item {
-      border: 1px solid #ccc;
-      background: #fff;
-      margin: 10px auto;
-      padding: 10px;
-      width: 90%;
+    .video-card {
+      background: #1e1e1e;
+      margin: 1rem 0;
+      padding: 1rem;
       border-radius: 10px;
-      box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
       text-align: left;
       position: relative;
     }
+    .video-card h3 {
+      margin: 0.5rem 0;
+    }
     .edit-icon {
       position: absolute;
-      top: 10px;
-      right: 10px;
+      top: 1rem;
+      right: 1rem;
       cursor: pointer;
-      font-size: 18px;
-      color: #c00;
+      color: #aaa;
     }
-    iframe {
-      width: 100%;
-      max-width: 400px;
-      height: 200px;
-      margin-top: 10px;
+    .edit-icon:hover {
+      color: #fff;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>YouTube Rights Dashboard</h1>
+    <div id="auth-section">
+      <button onclick="login()">Sign in with Google</button>
+    </div>
+    <div id="dashboard" style="display: none;">
+      <h2>Your Uploaded Videos</h2>
+      <div id="videos"></div>
+    </div>
+  </div>
 
-<h1>YouTube Rights Dashboard</h1>
-<button id="loginBtn">🔐 Login with Google</button>
-<div id="status"></div>
-<h2>Your Uploaded Videos</h2>
-<div id="videoList">🔄 Loading...</div>
+  <script>
+    const CLIENT_ID = '85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com';
+    const REDIRECT_URI = window.location.origin + window.location.pathname;
+    const SCOPES = [
+      "https://www.googleapis.com/auth/youtube",
+      "https://www.googleapis.com/auth/youtube.readonly",
+      "https://www.googleapis.com/auth/youtube.force-ssl",
+      "https://www.googleapis.com/auth/youtubepartner",
+      "https://www.googleapis.com/auth/youtubepartner-content-owner-readonly",
+      "https://www.googleapis.com/auth/youtube.upload",
+      "https://www.googleapis.com/auth/youtube.channel-memberships.creator",
+      "https://www.googleapis.com/auth/youtube.content-owner.readonly"
+    ].join(' ');
 
-<script>
-const CLIENT_ID = '85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com';
-const SCOPES = [
-  'https://www.googleapis.com/auth/youtube',
-  'https://www.googleapis.com/auth/youtube.force-ssl',
-  'https://www.googleapis.com/auth/youtube.readonly',
-  'https://www.googleapis.com/auth/youtubepartner',
-  'https://www.googleapis.com/auth/youtube.upload',
-  'https://www.googleapis.com/auth/youtubepartner-channel-audit',
-  'https://www.googleapis.com/auth/youtube.channel-memberships.creator'
-].join(' ');
-
-let token = null;
-
-function setTokenRefreshTimer(expiry = 3300) {
-  setTimeout(() => {
-    console.log('🔁 Token expiring. Reauthenticating...');
-    startAuth();
-  }, expiry * 1000);
-}
-
-function startAuth() {
-  const redirectUri = window.location.origin + window.location.pathname;
-  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=${encodeURIComponent(SCOPES)}&include_granted_scopes=true&prompt=consent`;
-  window.location.href = authUrl;
-}
-
-document.getElementById('loginBtn').onclick = () => startAuth();
-
-window.onload = () => {
-  const hash = window.location.hash;
-  if (hash.includes('access_token')) {
-    const params = new URLSearchParams(hash.substring(1));
-    token = params.get('access_token');
-    const expiresIn = parseInt(params.get('expires_in')) || 3600;
-    setTokenRefreshTimer(expiresIn - 300);
-    window.history.replaceState({}, document.title, window.location.pathname);
-    document.getElementById('status').innerHTML = '✅ Logged in with YouTube';
-    document.getElementById('loginBtn').style.display = 'none';
-    loadVideos();
-  } else {
-    document.getElementById('videoList').innerHTML = '🔒 Please log in to view your videos.';
-  }
-};
-
-function loadVideos() {
-  fetch('https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true', {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-  .then(res => res.json())
-  .then(data => {
-    const uploadsId = data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
-    if (!uploadsId) throw new Error("❌ No uploads playlist found.");
-
-    return fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsId}&maxResults=20`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-  })
-  .then(res => res.json())
-  .then(data => {
-    const list = document.getElementById('videoList');
-    list.innerHTML = '';
-    if (!data.items || data.items.length === 0) {
-      list.innerHTML = '❌ No videos found.';
-      return;
+    function login() {
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${encodeURIComponent(SCOPES)}&include_granted_scopes=true&prompt=consent`;
+      window.location.href = authUrl;
     }
-    data.items.forEach(item => {
-      const videoId = item.snippet.resourceId.videoId;
-      const title = item.snippet.title;
-      const div = document.createElement('div');
-      div.className = 'video-item';
-      div.innerHTML = `
-        <span class="edit-icon" onclick="location.href='rights.html?videoId=${videoId}'">✏️</span>
-        <strong>${title}</strong><br>
-        <iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
-      `;
-      list.appendChild(div);
-    });
-  })
-  .catch(err => {
-    console.error(err);
-    document.getElementById('videoList').innerText = '❌ Failed to load videos.';
-  });
-}
-</script>
 
+    function getAccessTokenFromUrl() {
+      const hash = window.location.hash.substring(1);
+      const params = new URLSearchParams(hash);
+      return params.get('access_token');
+    }
+
+    async function fetchVideos(token) {
+      const res = await fetch('https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,status&mine=true&maxResults=10', {
+        headers: {
+          Authorization: 'Bearer ' + token
+        }
+      });
+      const data = await res.json();
+      return data.items || [];
+    }
+
+    async function init() {
+      let token = localStorage.getItem('access_token');
+
+      const tokenFromUrl = getAccessTokenFromUrl();
+      if (tokenFromUrl) {
+        localStorage.setItem('access_token', tokenFromUrl);
+        window.location.hash = '';
+        token = tokenFromUrl;
+      }
+
+      if (token) {
+        document.getElementById('auth-section').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+
+        try {
+          const videos = await fetchVideos(token);
+          const videoList = document.getElementById('videos');
+          videoList.innerHTML = '';
+
+          videos.forEach(video => {
+            const card = document.createElement('div');
+            card.className = 'video-card';
+            card.innerHTML = `
+              <span class="edit-icon">&#9998;</span>
+              <h3>${video.snippet.title}</h3>
+              <p>${video.snippet.description || 'No description'}</p>
+              <p><strong>Status:</strong> ${video.status.privacyStatus}</p>
+            `;
+            videoList.appendChild(card);
+          });
+
+        } catch (err) {
+          alert("Token expired. Please login again.");
+          localStorage.removeItem('access_token');
+          window.location.reload();
+        }
+      }
+    }
+
+    window.onload = init;
+  </script>
 </body>
 </html>
