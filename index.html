@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube Studio - Network Relationship</title>
+  <title>YouTube Studio - Network Ownership</title>
   <style>
     body {
       background-color: #181818;
@@ -42,14 +42,14 @@
 </head>
 <body>
   <div class="card">
-    <h1>YouTube Studio - Network Check</h1>
+    <h1>YouTube Studio - Network Ownership</h1>
     <button onclick="login()">Login with Google</button>
     <div class="info" id="output"></div>
   </div>
 
   <script>
     const CLIENT_ID = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
-    const REDIRECT_URI = window.location.origin + window.location.pathname; // auto redirect to self
+    const REDIRECT_URI = "https://saju.live.vercel.app/index.html"; // now index.html
     const SCOPES = [
       "https://www.googleapis.com/auth/youtubepartner",
       "https://www.googleapis.com/auth/youtubepartner-channel-audit",
@@ -78,6 +78,7 @@
           <p><strong>Title:</strong> ${channel.snippet.title}</p>
           <p><strong>Channel ID:</strong> ${channel.id}</p>
           <p><strong>Status:</strong> ${channel.status.longUploadsStatus}</p>
+          <p><strong>Owner:</strong> (Check in YouTube Studio Rights Panel)</p>
         `;
       } else {
         output.innerHTML = "<p>❌ Could not retrieve channel info.</p>";
