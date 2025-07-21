@@ -3,96 +3,59 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube Studio - Network Relationship</title>
+  <title>YouTube Network Login</title>
   <style>
     body {
-      background-color: #181818;
+      font-family: Arial, sans-serif;
+      background: #0f0f0f;
       color: #fff;
-      font-family: "Roboto", sans-serif;
-      text-align: center;
-      padding: 50px;
-    }
-    .card {
-      background-color: #212121;
-      border-radius: 10px;
-      padding: 20px;
-      margin: 20px auto;
-      width: 90%;
-      max-width: 600px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
     }
     button {
-      background-color: #cc0000;
+      padding: 15px 25px;
+      font-size: 18px;
+      background-color: #FF0000;
       color: white;
       border: none;
-      padding: 12px 25px;
       border-radius: 5px;
-      font-size: 16px;
       cursor: pointer;
-      margin-top: 20px;
+      transition: 0.3s ease;
     }
     button:hover {
-      background-color: #e60000;
-    }
-    .info {
-      margin-top: 20px;
-      word-wrap: break-word;
+      background-color: #cc0000;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>YouTube Studio - Network Check</h1>
-    <button onclick="login()">Login with Google</button>
-    <div class="info" id="output"></div>
-  </div>
+
+  <h1>YouTube Studio Network Login</h1>
+  <button onclick="login()">Sign in with Google</button>
 
   <script>
-    const CLIENT_ID = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
-    const REDIRECT_URI = window.location.origin + window.location.pathname; // auto redirect to self
-    const SCOPES = [
-      "https://www.googleapis.com/auth/youtubepartner",
-      "https://www.googleapis.com/auth/youtubepartner-channel-audit",
-      "https://www.googleapis.com/auth/youtube.content-owner.readonly",
-      "https://www.googleapis.com/auth/youtube.rights"
-    ].join(" ");
-
     function login() {
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=token&scope=${encodeURIComponent(SCOPES)}&include_granted_scopes=true`;
+      const clientId = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
+      const redirectUri = "https://saju-live.vercel.app";
+      const scope = [
+        "https://www.googleapis.com/auth/youtubepartner",
+        "https://www.googleapis.com/auth/youtubepartner-channel-audit",
+        "https://www.googleapis.com/auth/youtube.content-owner.readonly",
+        "https://www.googleapis.com/auth/youtube.rights"
+      ].join(' ');
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scope)}&include_granted_scopes=true`;
+
       window.location.href = authUrl;
     }
 
-    async function fetchRightsInfo(token) {
-      const output = document.getElementById("output");
-
-      try {
-        const res = await fetch("https://www.googleapis.com/youtube/v3/channels?part=snippet,status&mine=true", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        const data = await res.json();
-
-        if (data.items && data.items.length > 0) {
-          const channel = data.items[0];
-          output.innerHTML = `
-            <h3>✅ Channel Detected</h3>
-            <p><strong>Title:</strong> ${channel.snippet.title}</p>
-            <p><strong>Channel ID:</strong> ${channel.id}</p>
-            <p><strong>Status:</strong> ${channel.status.longUploadsStatus || "N/A"}</p>
-          `;
-        } else {
-          output.innerHTML = "<p>❌ Could not retrieve channel info.</p>";
-        }
-      } catch (e) {
-        output.innerHTML = `<p>⚠️ Error: ${e.message}</p>`;
-      }
-    }
-
-    window.onload = () => {
+    // Auto redirect to YouTube Studio Network tab after login
+    window.onload = function () {
       const hash = window.location.hash;
       if (hash.includes("access_token")) {
-        const token = new URLSearchParams(hash.substring(1)).get("access_token");
-        fetchRightsInfo(token);
+        // Optional: You can store the token if needed
+        window.location.href = "https://studio.youtube.com/channel/UC/network";
       }
     };
   </script>
