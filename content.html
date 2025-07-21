@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Rights Management – Ownership</title>
+  <title>Content Rights Management</title>
   <style>
     body {
       font-family: Roboto, Arial, sans-serif;
@@ -24,18 +24,6 @@
     h2 {
       margin-top: 0;
       color: #202124;
-    }
-
-    .step-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 25px;
-    }
-
-    .step-header span {
-      font-size: 14px;
-      color: #666;
     }
 
     .form-section {
@@ -80,37 +68,6 @@
       min-width: 220px;
     }
 
-    .ownership-options {
-      display: flex;
-      gap: 25px;
-      margin-bottom: 15px;
-    }
-
-    .ownership-options label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: normal;
-    }
-
-    .territory-options {
-      margin-top: 10px;
-      padding-left: 20px;
-      border-left: 2px solid #ddd;
-    }
-
-    .checkbox-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
-    }
-
-    .note {
-      font-size: 14px;
-      color: #777;
-    }
-
     .button-row {
       text-align: right;
       margin-top: 20px;
@@ -129,6 +86,23 @@
     button:hover {
       background-color: #054ab8;
     }
+
+    .note {
+      font-size: 14px;
+      color: #777;
+    }
+
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .step-header span {
+      font-size: 14px;
+      color: #666;
+    }
   </style>
 </head>
 <body>
@@ -138,42 +112,66 @@
       <span>Step 2 of 7</span>
     </div>
 
-    <form id="ownershipForm">
+    <form id="rightsForm">
+      <!-- Upload Policy -->
+      <div class="form-section">
+        <h3>Upload Policy</h3>
+        <div class="form-group">
+          <label for="uploadPolicy">Policy applied to this video</label>
+          <select id="uploadPolicy" required>
+            <option value="monetize">Monetize in all countries</option>
+            <option value="block">Block in all countries</option>
+            <option value="track">Track usage globally</option>
+          </select>
+          <p class="note">Policy preview: <strong id="policyPreview">Monetize it • Worldwide</strong></p>
+        </div>
+      </div>
+
+      <!-- Ownership -->
       <div class="form-section">
         <h3>Ownership</h3>
-
-        <div class="ownership-options">
-          <label>
-            <input type="radio" name="ownershipType" value="global" checked>
-            Global
-          </label>
-          <label>
-            <input type="radio" name="ownershipType" value="specific">
-            Specific territories
-          </label>
+        <div class="form-group">
+          <label for="ownership">Select ownership type</label>
+          <select id="ownership" required>
+            <option value="global">Global</option>
+            <option value="specific">Specific Territories</option>
+          </select>
         </div>
+      </div>
 
-        <div id="specificOptions" style="display: none;">
-          <div class="ownership-options">
-            <label>
-              <input type="radio" name="territoryMode" value="own_in" checked>
-              Own in selected territories
-            </label>
-            <label>
-              <input type="radio" name="territoryMode" value="own_except">
-              Own everywhere except selected territories
-            </label>
+      <!-- Asset Info -->
+      <div class="form-section">
+        <h3>Asset Information</h3>
+        <div class="form-inline">
+          <div class="form-group">
+            <label for="assetTitle">Asset Title</label>
+            <input type="text" id="assetTitle" placeholder="e.g. Godi Utha Ke Mazza Marlo (Official)" required>
           </div>
 
           <div class="form-group">
-            <label for="territories">Territories (comma-separated)</label>
-            <input type="text" id="territories" placeholder="e.g. US, IN, BD">
+            <label for="customId">Custom ID</label>
+            <input type="text" id="customId" placeholder="e.g. GULSHAN12345">
           </div>
+        </div>
 
-          <div class="checkbox-group">
-            <input type="checkbox" id="blockOutside">
-            <label for="blockOutside">Block video outside your territories of ownership</label>
-          </div>
+        <div class="form-group">
+          <label for="assetType">Asset Type</label>
+          <select id="assetType">
+            <option value="Web">Web</option>
+            <option value="TV">TV</option>
+            <option value="Film">Film</option>
+            <option value="Music">Music</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Asset Description</label>
+          <textarea id="description" rows="3" placeholder="Describe this asset in detail..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="notes">Notes</label>
+          <textarea id="notes" rows="2" placeholder="Optional internal notes..."></textarea>
         </div>
       </div>
 
@@ -183,34 +181,34 @@
     </form>
   </div>
 
+  <!-- ✅ FULLY FUNCTIONAL SCRIPT BLOCK -->
   <script>
-    const ownershipRadios = document.querySelectorAll('input[name="ownershipType"]');
-    const specificOptions = document.getElementById('specificOptions');
+    const policyPreview = document.getElementById("policyPreview");
 
-    ownershipRadios.forEach(radio => {
-      radio.addEventListener('change', () => {
-        specificOptions.style.display = (radio.value === 'specific' && radio.checked) ? 'block' : 'none';
-      });
+    document.getElementById("uploadPolicy").addEventListener("change", function () {
+      const value = this.value;
+      if (value === "monetize") policyPreview.innerText = "Monetize it • Worldwide";
+      else if (value === "block") policyPreview.innerText = "Block it • Worldwide";
+      else if (value === "track") policyPreview.innerText = "Track usage • Worldwide";
     });
 
-    document.getElementById("ownershipForm").addEventListener("submit", function (e) {
+    document.getElementById("rightsForm").addEventListener("submit", function (e) {
       e.preventDefault();
 
-      const ownershipType = document.querySelector('input[name="ownershipType"]:checked').value;
-      const data = {
-        ownershipType,
+      const formData = {
+        policy: document.getElementById("uploadPolicy").value,
+        ownership: document.getElementById("ownership").value,
+        assetTitle: document.getElementById("assetTitle").value,
+        customId: document.getElementById("customId").value,
+        assetType: document.getElementById("assetType").value,
+        description: document.getElementById("description").value,
+        notes: document.getElementById("notes").value
       };
 
-      if (ownershipType === 'specific') {
-        data.territoryMode = document.querySelector('input[name="territoryMode"]:checked').value;
-        data.territories = document.getElementById("territories").value.split(',').map(s => s.trim()).filter(Boolean);
-        data.blockOutside = document.getElementById("blockOutside").checked;
-      }
+      console.log("🔐 Collected Data:", formData);
+      alert("✅ Rights info saved:\n" + JSON.stringify(formData, null, 2));
 
-      console.log("📦 Ownership Data:", data);
-      alert("✅ Ownership data saved:\n" + JSON.stringify(data, null, 2));
-
-      // Submit this to backend or save in localStorage/session if needed
+      // TODO: Later send to backend or YouTube API
     });
   </script>
 </body>
