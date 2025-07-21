@@ -1,126 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>YouTube CMS Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: 'Roboto', sans-serif;
-      background: #0f0f0f;
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 2rem;
+    }
+    #login-btn {
+      padding: 10px 20px;
+      background: #cc0000;
       color: #fff;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background: #202020;
-      padding: 16px;
-      font-size: 1.5rem;
-      text-align: center;
-      font-weight: bold;
-      border-bottom: 1px solid #333;
-    }
-    .container {
-      padding: 20px;
-    }
-    .login-btn {
-      background: red;
-      color: white;
-      padding: 12px 20px;
       border: none;
-      border-radius: 4px;
-      font-size: 1rem;
+      font-size: 16px;
       cursor: pointer;
+      margin-bottom: 2rem;
+    }
+    #video-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
     }
     .video-card {
-      background: #181818;
+      background: white;
+      padding: 1rem;
       border-radius: 8px;
-      margin-bottom: 20px;
-      padding: 16px;
-      display: flex;
-      gap: 16px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     .video-card img {
-      width: 160px;
-      border-radius: 4px;
+      width: 100%;
+      border-radius: 5px;
     }
-    .video-info {
-      flex: 1;
-    }
-    .video-info h3 {
-      margin: 0 0 10px;
-    }
-    .video-info p {
-      margin: 4px 0;
-      font-size: 0.9rem;
-      color: #ccc;
+    .video-title {
+      margin-top: 0.5rem;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <header>YouTube CMS Dashboard</header>
-  <div class="container">
-    <button class="login-btn" onclick="authenticate()">🔐 Login with Google</button>
-    <div id="videos"></div>
-  </div>
+
+  <button id="login-btn">Login with Google</button>
+  <div id="video-list"></div>
 
   <script>
     const CLIENT_ID = '85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com';
+    const REDIRECT_URI = 'https://saju-live.vercel.app/';
     const SCOPES = [
-      'https://www.googleapis.com/auth/youtube.readonly',
-      'https://www.googleapis.com/auth/youtube.force-ssl'
+      'https://www.googleapis.com/auth/youtube.force-ssl',
+      'https://www.googleapis.com/auth/youtube.readonly'
     ].join(' ');
 
-    function authenticate() {
-      const redirectUri = window.location.href.split("#")[0];
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(SCOPES)}&include_granted_scopes=true`;
-      window.location = authUrl;
-    }
-
-    function getAccessTokenFromUrl() {
-      const params = new URLSearchParams(window.location.hash.substr(1));
-      return params.get('access_token');
-    }
-
-    async function fetchVideos(token) {
-      const response = await fetch('https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,status&mine=true&maxResults=25', {
-        headers: {
-          Authorization: `Bearer ${token}`
+    // Step 1: Token Check
+    window.onload = () => {
+      const hash = window.location.hash;
+      if (hash.includes('access_token')) {
+        const params = new URLSearchParams(hash.substring(1));
+        const token = params.get('access_token');
+        const expiresIn = parseInt(params.get('expires_in'));
+        const expiryTime = new Date().getTime() + expiresIn * 1000;
+        localStorage.setItem('yt_token', token);
+        localStorage.setItem('yt_token_expiry', expiryTime);
+        window.location.hash = '';
+        fetchVideos(token);
+      } else {
+        const token = localStorage.getItem('yt_token');
+        const expiry = localStorage.getItem('yt_token_expiry');
+        if (token && expiry && new Date().getTime() < parseInt(expiry)) {
+          fetchVideos(token);
         }
-      });
+      }
+    };
 
-      const data = await response.json();
-      const videoContainer = document.getElementById('videos');
-      videoContainer.innerHTML = '';
+    // Step 2: Login Button
+    document.getElementById('login-btn').onclick = () => {
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=${encodeURIComponent(SCOPES)}&include_granted_scopes=true&prompt=consent`;
+      window.location.href = authUrl;
+    };
 
-      if (data.items) {
+    // Step 3: Fetch Videos
+    async function fetchVideos(token) {
+      document.getElementById('login-btn').style.display = 'none';
+
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&myRating=like&maxResults=20&access_token=${token}`);
+      const data = await res.json();
+
+      const videoList = document.getElementById('video-list');
+      videoList.innerHTML = '';
+
+      if (data.items && data.items.length > 0) {
         data.items.forEach(video => {
           const card = document.createElement('div');
           card.className = 'video-card';
           card.innerHTML = `
-            <img src="${video.snippet.thumbnails.medium.url}" alt="Thumbnail" />
-            <div class="video-info">
-              <h3>${video.snippet.title}</h3>
-              <p>Views: ${video.statistics.viewCount}</p>
-              <p>Likes: ${video.statistics.likeCount || '0'}</p>
-              <p>Status: ${video.status.privacyStatus}</p>
-            </div>
+            <img src="${video.snippet.thumbnails.medium.url}" alt="thumbnail" />
+            <div class="video-title">${video.snippet.title}</div>
+            <p>Views: ${video.statistics.viewCount}</p>
+            <p>Likes: ${video.statistics.likeCount || 'N/A'}</p>
           `;
-          videoContainer.appendChild(card);
+          videoList.appendChild(card);
         });
       } else {
-        videoContainer.innerHTML = '<p>⚠️ No videos found or permission denied.</p>';
+        videoList.innerHTML = '<p>No liked videos found. Try uploading or liking some videos!</p>';
       }
     }
-
-    window.onload = () => {
-      const token = getAccessTokenFromUrl();
-      if (token) {
-        document.querySelector('.login-btn').style.display = 'none';
-        fetchVideos(token);
-      }
-    };
   </script>
+
 </body>
 </html>
