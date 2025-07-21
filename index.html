@@ -45,11 +45,19 @@
 <button id="loginBtn">🔐 Login with Google</button>
 <div id="status"></div>
 <h2>Your Videos</h2>
-<div id="videoList">Loading...</div>
+<div id="videoList">🔄 Loading...</div>
 
 <script>
 const CLIENT_ID = '85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com';
-const SCOPES = 'https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/youtube.force-ssl https://www.googleapis.com/auth/youtubepartner';
+const SCOPES = [
+  'https://www.googleapis.com/auth/youtube',
+  'https://www.googleapis.com/auth/youtube.force-ssl',
+  'https://www.googleapis.com/auth/youtube.readonly',
+  'https://www.googleapis.com/auth/youtubepartner',
+  'https://www.googleapis.com/auth/youtube.upload',
+  'https://www.googleapis.com/auth/youtubepartner-channel-audit',
+  'https://www.googleapis.com/auth/youtube.channel-memberships.creator'
+].join(' ');
 
 let token = null;
 
@@ -65,38 +73,50 @@ window.onload = () => {
     const params = new URLSearchParams(hash.substring(1));
     token = params.get('access_token');
     document.getElementById('status').innerHTML = '✅ Logged in with YouTube';
-    listVideos();
+    document.getElementById('loginBtn').style.display = 'none';
+    loadVideos();
+  } else {
+    document.getElementById('videoList').innerHTML = '🔒 Please log in to view your videos.';
   }
 };
 
-function listVideos() {
-  fetch('https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&mine=true&maxResults=20', {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
+function loadVideos() {
+  // Step 1: Get uploads playlist ID
+  fetch('https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true', {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (!data.items || data.items.length === 0) throw new Error("No channel found.");
+    const uploadsPlaylistId = data.items[0].contentDetails.relatedPlaylists.uploads;
+    // Step 2: Get videos from uploads playlist
+    return fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsPlaylistId}&maxResults=20`, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
   })
   .then(res => res.json())
   .then(data => {
     const list = document.getElementById('videoList');
     list.innerHTML = '';
     if (!data.items || data.items.length === 0) {
-      list.innerHTML = '❌ No videos found or permission denied.';
+      list.innerHTML = '❌ No videos found.';
       return;
     }
-    data.items.forEach(video => {
+    data.items.forEach(item => {
+      const videoId = item.snippet.resourceId.videoId;
+      const title = item.snippet.title;
       const div = document.createElement('div');
       div.className = 'video-item';
       div.innerHTML = `
-        <strong>${video.snippet.title}</strong><br>
-        Views: ${video.statistics.viewCount} | Likes: ${video.statistics.likeCount}<br>
-        <iframe src="https://www.youtube.com/embed/${video.id}" frameborder="0" allowfullscreen></iframe>
+        <strong>${title}</strong><br>
+        <iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
       `;
       list.appendChild(div);
     });
   })
   .catch(err => {
     console.error(err);
-    document.getElementById('videoList').innerText = '❌ Failed to fetch videos.';
+    document.getElementById('videoList').innerText = '❌ Failed to load videos.';
   });
 }
 </script>
