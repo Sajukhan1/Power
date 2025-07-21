@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Video Rights Management</title>
+  <title>Rights Management Panel</title>
   <style>
     body {
       font-family: Roboto, Arial, sans-serif;
@@ -97,7 +97,7 @@
 </head>
 <body>
   <div class="container">
-    <h2>Edit Video Metadata</h2>
+    <h2>Rights Management</h2>
 
     <div class="step-nav">
       <div class="step active">Details</div>
@@ -111,6 +111,22 @@
 
     <form id="videoForm">
       <div class="form-group">
+        <label for="uploadPolicy">Upload Policy</label>
+        <select id="uploadPolicy">
+          <option value="monetize">Monetize in all countries</option>
+          <option value="block">Block in all countries</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Ownership</label>
+        <select id="ownership">
+          <option value="global">Global</option>
+          <option value="territories">Specific territories</option>
+        </select>
+      </div>
+
+      <div class="form-group">
         <label for="assetType">Asset type</label>
         <select id="assetType">
           <option value="Web">Web</option>
@@ -121,13 +137,13 @@
 
       <div class="form-group">
         <label for="assetTitle">Asset title</label>
-        <input type="text" id="assetTitle" required placeholder="Enter asset title"/>
+        <input type="text" id="assetTitle" required />
       </div>
 
       <div class="row">
         <div class="form-group">
           <label for="customId">Custom ID</label>
-          <input type="text" id="customId" placeholder="Optional"/>
+          <input type="text" id="customId" placeholder="e.g. BNvEfRoC0lc" />
         </div>
 
         <div class="form-group">
@@ -152,8 +168,29 @@
     const videoId = params.get("videoId");
 
     if (!videoId) {
-      alert("❌ Video ID not found in URL (missing ?videoId=...)");
+      alert("❌ Video ID not found in URL (expected ?videoId=...)");
     }
+
+    // Fetch metadata (you can replace this with actual API call)
+    window.onload = async () => {
+      const mockData = {
+        assetType: "Web",
+        assetTitle: "India v Pakistan Asia Cup 2022 | Full Match",
+        customId: "BNvEfRoC0lc",
+        notes: "Major event match",
+        description: "Full match highlights of India vs Pakistan Asia Cup 2022.",
+        uploadPolicy: "monetize",
+        ownership: "global"
+      };
+
+      document.getElementById("assetType").value = mockData.assetType;
+      document.getElementById("assetTitle").value = mockData.assetTitle;
+      document.getElementById("customId").value = mockData.customId;
+      document.getElementById("notes").value = mockData.notes;
+      document.getElementById("description").value = mockData.description;
+      document.getElementById("uploadPolicy").value = mockData.uploadPolicy;
+      document.getElementById("ownership").value = mockData.ownership;
+    };
 
     document.getElementById("videoForm").addEventListener("submit", function (e) {
       e.preventDefault();
@@ -165,10 +202,11 @@
         customId: document.getElementById("customId").value,
         notes: document.getElementById("notes").value,
         description: document.getElementById("description").value,
+        uploadPolicy: document.getElementById("uploadPolicy").value,
+        ownership: document.getElementById("ownership").value
       };
 
-      // ✅ Show alert for now (later you can send to backend)
-      alert("✅ Saved:\n" + JSON.stringify(data, null, 2));
+      alert("✅ Saved Data:\n\n" + JSON.stringify(data, null, 2));
     });
   </script>
 </body>
