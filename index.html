@@ -51,8 +51,7 @@
       "https://www.googleapis.com/auth/youtube.force-ssl",
       "https://www.googleapis.com/auth/youtubepartner",
       "https://www.googleapis.com/auth/youtubepartner-channel-audit",
-      "https://www.googleapis.com/auth/youtubepartner-content-owner-readonly",
-      "https://www.googleapis.com/auth/youtubepartner-monetary.readonly"
+      "https://www.googleapis.com/auth/youtubepartner-content-owner-readonly"
     ].join(" ");
 
     function login() {
@@ -65,10 +64,10 @@
       const params = new URLSearchParams(hash);
       const token = params.get("access_token");
       if (token) {
-        const expiry = Date.now() + (3600 * 1000); // 1 hour
+        const expiry = Date.now() + (3600 * 1000);
         localStorage.setItem("yt_token", token);
         localStorage.setItem("yt_token_expiry", expiry);
-        window.history.replaceState({}, document.title, REDIRECT_URI); // Clean URL
+        window.history.replaceState({}, document.title, REDIRECT_URI);
         return token;
       }
 
