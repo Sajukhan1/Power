@@ -1,112 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>YouTube CMS Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
       font-family: Arial, sans-serif;
       background: #f9f9f9;
-      padding: 2rem;
+      margin: 0;
+      padding: 20px;
     }
-    #login-btn {
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+    h1 {
+      color: #cc0000;
+    }
+    button {
       padding: 10px 20px;
       background: #cc0000;
       color: #fff;
       border: none;
-      font-size: 16px;
-      cursor: pointer;
-      margin-bottom: 2rem;
-    }
-    #video-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 1rem;
-    }
-    .video-card {
-      background: white;
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    }
-    .video-card img {
-      width: 100%;
       border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
     }
-    .video-title {
-      margin-top: 0.5rem;
-      font-weight: bold;
+    .video {
+      background: white;
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body>
-
-  <button id="login-btn">Login with Google</button>
-  <div id="video-list"></div>
+  <div class="container">
+    <h1>YouTube CMS Dashboard</h1>
+    <button onclick="login()">🔐 Login with Google</button>
+    <div id="user"></div>
+    <div id="videos"></div>
+  </div>
 
   <script>
-    const CLIENT_ID = '85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com';
-    const REDIRECT_URI = 'https://saju-live.vercel.app/';
-    const SCOPES = [
-      'https://www.googleapis.com/auth/youtube.force-ssl',
-      'https://www.googleapis.com/auth/youtube.readonly'
-    ].join(' ');
+    const clientId = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
+    const redirectUri = "https://saju-live.vercel.app/index.html";
+    const scopes = [
+      "https://www.googleapis.com/auth/youtube.readonly",
+      "https://www.googleapis.com/auth/youtube.force-ssl"
+    ].join(" ");
 
-    // Step 1: Token Check
-    window.onload = () => {
+    let accessToken = null;
+    let tokenExpiresAt = 0;
+
+    function login() {
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${encodeURIComponent(scopes)}&include_granted_scopes=true&prompt=consent`;
+      window.location.href = authUrl;
+    }
+
+    function extractToken() {
       const hash = window.location.hash;
-      if (hash.includes('access_token')) {
-        const params = new URLSearchParams(hash.substring(1));
-        const token = params.get('access_token');
-        const expiresIn = parseInt(params.get('expires_in'));
-        const expiryTime = new Date().getTime() + expiresIn * 1000;
-        localStorage.setItem('yt_token', token);
-        localStorage.setItem('yt_token_expiry', expiryTime);
-        window.location.hash = '';
-        fetchVideos(token);
+      if (hash) {
+        const params = new URLSearchParams(hash.substr(1));
+        accessToken = params.get("access_token");
+        const expiresIn = parseInt(params.get("expires_in"));
+        tokenExpiresAt = Date.now() + (expiresIn * 1000);
+        localStorage.setItem("yt_access_token", accessToken);
+        localStorage.setItem("yt_token_expiry", tokenExpiresAt);
+        window.location.hash = ""; // clear hash
       } else {
-        const token = localStorage.getItem('yt_token');
-        const expiry = localStorage.getItem('yt_token_expiry');
-        if (token && expiry && new Date().getTime() < parseInt(expiry)) {
-          fetchVideos(token);
+        accessToken = localStorage.getItem("yt_access_token");
+        tokenExpiresAt = parseInt(localStorage.getItem("yt_token_expiry"));
+        if (accessToken && Date.now() > tokenExpiresAt - 60000) {
+          console.log("Token expired, logging in again...");
+          login(); // Auto-refresh if token is near expiry
         }
       }
-    };
+    }
 
-    // Step 2: Login Button
-    document.getElementById('login-btn').onclick = () => {
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=${encodeURIComponent(SCOPES)}&include_granted_scopes=true&prompt=consent`;
-      window.location.href = authUrl;
-    };
+    async function loadVideos() {
+      if (!accessToken) return;
 
-    // Step 3: Fetch Videos
-    async function fetchVideos(token) {
-      document.getElementById('login-btn').style.display = 'none';
+      document.getElementById("user").innerText = "✅ Logged in";
 
-      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&myRating=like&maxResults=20&access_token=${token}`);
+      const res = await fetch("https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,status&mine=true&maxResults=10", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      });
+
       const data = await res.json();
+      const videosDiv = document.getElementById("videos");
+      videosDiv.innerHTML = "<h2>Your Videos</h2>";
 
-      const videoList = document.getElementById('video-list');
-      videoList.innerHTML = '';
+      if (!data.items) {
+        videosDiv.innerHTML += "<p>No videos found or permission denied.</p>";
+        return;
+      }
 
-      if (data.items && data.items.length > 0) {
-        data.items.forEach(video => {
-          const card = document.createElement('div');
-          card.className = 'video-card';
-          card.innerHTML = `
-            <img src="${video.snippet.thumbnails.medium.url}" alt="thumbnail" />
-            <div class="video-title">${video.snippet.title}</div>
-            <p>Views: ${video.statistics.viewCount}</p>
-            <p>Likes: ${video.statistics.likeCount || 'N/A'}</p>
-          `;
-          videoList.appendChild(card);
-        });
+      data.items.forEach(video => {
+        const v = document.createElement("div");
+        v.className = "video";
+        v.innerHTML = `
+          <strong>🎬 ${video.snippet.title}</strong><br>
+          Video ID: ${video.id}<br>
+          <button onclick="applyRestriction('${video.id}')">🌍 Restrict to Bangladesh Only</button>
+        `;
+        videosDiv.appendChild(v);
+      });
+    }
+
+    async function applyRestriction(videoId) {
+      if (!accessToken) return alert("Access token missing!");
+
+      const body = {
+        id: videoId,
+        status: {
+          selfDeclaredMadeForKids: false,
+          privacyStatus: "public",
+          embeddable: true,
+          regionRestriction: {
+            blocked: [ "US", "IN", "PK", "CA", "GB", "AU", "FR", "DE", "RU", "CN", "JP", "SA", "AE", "BR", "IT", "ES", "NG", "MX", "ZA" ]
+          }
+        }
+      };
+
+      const res = await fetch("https://www.googleapis.com/youtube/v3/videos?part=status", {
+        method: "PUT",
+        headers: {
+          "Authorization": `Bearer ${accessToken}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        alert("✅ Geo restriction applied to Bangladesh only!");
       } else {
-        videoList.innerHTML = '<p>No liked videos found. Try uploading or liking some videos!</p>';
+        const err = await res.json();
+        console.error(err);
+        alert("❌ Failed to apply restriction.");
       }
     }
-  </script>
 
+    extractToken();
+    if (accessToken) loadVideos();
+  </script>
 </body>
 </html>
