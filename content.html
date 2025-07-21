@@ -70,12 +70,12 @@
 
     .button-row {
       text-align: right;
-      margin-top: 20px;
+      margin-top: 30px;
     }
 
     button {
-      padding: 10px 20px;
-      font-size: 15px;
+      padding: 10px 25px;
+      font-size: 16px;
       border: none;
       border-radius: 6px;
       background-color: #065fd4;
@@ -147,68 +147,52 @@
             <label for="assetTitle">Asset Title</label>
             <input type="text" id="assetTitle" placeholder="e.g. Godi Utha Ke Mazza Marlo (Official)" required>
           </div>
-
           <div class="form-group">
-            <label for="customId">Custom ID</label>
-            <input type="text" id="customId" placeholder="e.g. GULSHAN12345">
+            <label for="customID">Custom ID</label>
+            <input type="text" id="customID" placeholder="e.g. GODI-2025-XYZ">
           </div>
         </div>
-
         <div class="form-group">
-          <label for="assetType">Asset Type</label>
-          <select id="assetType">
-            <option value="Web">Web</option>
-            <option value="TV">TV</option>
-            <option value="Film">Film</option>
-            <option value="Music">Music</option>
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label for="description">Asset Description</label>
-          <textarea id="description" rows="3" placeholder="Describe this asset in detail..."></textarea>
-        </div>
-
-        <div class="form-group">
-          <label for="notes">Notes</label>
-          <textarea id="notes" rows="2" placeholder="Optional internal notes..."></textarea>
+          <label for="description">Description / Note</label>
+          <textarea id="description" rows="3" placeholder="Write notes or description..."></textarea>
         </div>
       </div>
 
+      <!-- Submit Button -->
       <div class="button-row">
-        <button type="submit">NEXT</button>
+        <button type="submit">Next ➤</button>
       </div>
     </form>
   </div>
 
-  <!-- ✅ FULLY FUNCTIONAL SCRIPT BLOCK -->
   <script>
-    const policyPreview = document.getElementById("policyPreview");
+    const uploadPolicy = document.getElementById('uploadPolicy');
+    const policyPreview = document.getElementById('policyPreview');
 
-    document.getElementById("uploadPolicy").addEventListener("change", function () {
-      const value = this.value;
-      if (value === "monetize") policyPreview.innerText = "Monetize it • Worldwide";
-      else if (value === "block") policyPreview.innerText = "Block it • Worldwide";
-      else if (value === "track") policyPreview.innerText = "Track usage • Worldwide";
+    uploadPolicy.addEventListener('change', () => {
+      const value = uploadPolicy.value;
+      if (value === 'monetize') {
+        policyPreview.textContent = 'Monetize it • Worldwide';
+      } else if (value === 'block') {
+        policyPreview.textContent = 'Block it • Worldwide';
+      } else if (value === 'track') {
+        policyPreview.textContent = 'Track usage • Globally';
+      }
     });
 
-    document.getElementById("rightsForm").addEventListener("submit", function (e) {
+    document.getElementById('rightsForm').addEventListener('submit', function (e) {
       e.preventDefault();
-
-      const formData = {
-        policy: document.getElementById("uploadPolicy").value,
-        ownership: document.getElementById("ownership").value,
-        assetTitle: document.getElementById("assetTitle").value,
-        customId: document.getElementById("customId").value,
-        assetType: document.getElementById("assetType").value,
-        description: document.getElementById("description").value,
-        notes: document.getElementById("notes").value
+      // ✅ Save form data to localStorage (optional)
+      const data = {
+        policy: uploadPolicy.value,
+        ownership: document.getElementById('ownership').value,
+        title: document.getElementById('assetTitle').value,
+        customID: document.getElementById('customID').value,
+        note: document.getElementById('description').value
       };
-
-      console.log("🔐 Collected Data:", formData);
-      alert("✅ Rights info saved:\n" + JSON.stringify(formData, null, 2));
-
-      // TODO: Later send to backend or YouTube API
+      localStorage.setItem('rightsFormData', JSON.stringify(data));
+      // ✅ Redirect to Step 3
+      window.location.href = 'geo.html';
     });
   </script>
 </body>
