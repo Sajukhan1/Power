@@ -1,101 +1,134 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>YouTube Studio CMS</title>
   <meta charset="UTF-8">
+  <title>YouTube Rights Manager</title>
   <style>
     body {
-      background: #181818;
+      background: #0f0f0f;
       color: white;
       font-family: Arial, sans-serif;
       text-align: center;
-      padding: 50px;
+      padding: 40px;
     }
-    button {
-      background: #FF0000;
+    h1 {
+      color: #FF0000;
+    }
+    .button {
+      background-color: #FF0000;
       color: white;
-      border: none;
-      padding: 15px 30px;
+      padding: 12px 25px;
       font-size: 18px;
+      border: none;
       border-radius: 5px;
+      margin: 10px;
       cursor: pointer;
     }
-    #videos {
-      margin-top: 30px;
+    .video-card {
+      background: #1c1c1c;
+      margin: 15px auto;
+      padding: 15px;
+      width: 80%;
+      border-radius: 10px;
       text-align: left;
     }
-    .video {
-      background: #282828;
-      padding: 15px;
-      margin-bottom: 10px;
-      border-radius: 8px;
+    .video-card h3 {
+      margin-bottom: 5px;
+    }
+    .video-card button {
+      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
   <h1>YouTube Rights Dashboard</h1>
-  <button id="loginBtn">Login with Google</button>
-  <div id="videos"></div>
+  <button class="button" onclick="login()">Login with Google</button>
+
+  <div id="dashboard" style="display:none;">
+    <h2>🎬 Your Uploaded Videos</h2>
+    <div id="videoList"></div>
+  </div>
 
   <script>
-    const clientId = '85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com';
-    const redirectUri = 'https://saju-live.vercel.app';
-    const scopes = [
-      "https://www.googleapis.com/auth/youtube.readonly",
-      "https://www.googleapis.com/auth/youtube.upload",
-      "https://www.googleapis.com/auth/youtube.force-ssl",
-      "https://www.googleapis.com/auth/youtubepartner",
-      "https://www.googleapis.com/auth/youtubepartner-channel-audit",
-      "https://www.googleapis.com/auth/youtube",
-      "https://www.googleapis.com/auth/youtube.monitize",
-      "https://www.googleapis.com/auth/youtube.manage"
-    ];
+    const CLIENT_ID = '85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com';
+    const SCOPES = [
+      'https://www.googleapis.com/auth/youtube.readonly',
+      'https://www.googleapis.com/auth/youtube.force-ssl',
+      'https://www.googleapis.com/auth/youtube.upload',
+      'https://www.googleapis.com/auth/youtubepartner',
+      'https://www.googleapis.com/auth/youtubepartner-channel-audit',
+      'https://www.googleapis.com/auth/youtube'
+    ].join(' ');
+    const REDIRECT_URI = window.location.origin + window.location.pathname;
 
-    const accessToken = new URLSearchParams(window.location.hash.substr(1)).get("access_token");
-    if (accessToken) {
-      localStorage.setItem("yt_token", accessToken);
-      history.replaceState(null, '', redirectUri); // Clean URL
-      fetchVideos(accessToken);
-    } else if (localStorage.getItem("yt_token")) {
-      fetchVideos(localStorage.getItem("yt_token"));
+    function login() {
+      const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=token&scope=${encodeURIComponent(SCOPES)}&include_granted_scopes=true`;
+      window.location.href = url;
     }
 
-    document.getElementById('loginBtn').addEventListener('click', () => {
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${scopes.join(' ')}&include_granted_scopes=true`;
-      window.location.href = authUrl;
-    });
+    window.onload = async () => {
+      const hash = new URLSearchParams(window.location.hash.substr(1));
+      const token = hash.get('access_token');
+      if (token) {
+        document.querySelector('button').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        loadVideos(token);
+      }
+    };
 
-    async function fetchVideos(token) {
-      document.getElementById('loginBtn').style.display = 'none';
-      const res = await fetch('https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&mine=true&maxResults=10', {
-        headers: {
-          Authorization: 'Bearer ' + token
-        }
+    async function loadVideos(token) {
+      const res = await fetch('https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,status&mine=true&maxResults=10', {
+        headers: { Authorization: 'Bearer ' + token }
       });
+      const data = await res.json();
 
-      if (res.status === 401) {
-        localStorage.removeItem("yt_token");
-        alert("Session expired. Please log in again.");
-        location.reload();
+      const videoList = document.getElementById('videoList');
+      if (!data.items) {
+        videoList.innerHTML = '<p>⚠️ কোনো ভিডিও পাওয়া যায়নি।</p>';
         return;
       }
 
-      const data = await res.json();
-      const container = document.getElementById('videos');
-      container.innerHTML = '<h2>Your Videos</h2>';
-      data.items?.forEach(video => {
-        const div = document.createElement('div');
-        div.className = 'video';
-        div.innerHTML = `
-          <h3>${video.snippet.title}</h3>
-          <p>Views: ${video.statistics.viewCount}</p>
-          <p>Likes: ${video.statistics.likeCount}</p>
+      data.items.forEach(video => {
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.innerHTML = `
+          <h3>📹 ${video.snippet.title}</h3>
+          <p>👁 Views: ${video.statistics.viewCount} | 👍 Likes: ${video.statistics.likeCount || 0}</p>
+          <p>💰 Monetization: ${video.status.monetizationDetails?.access || 'Unknown'}</p>
+          <button class="button" onclick="applyGeoRestriction('${video.id}', '${token}')">🌍 Restrict to Bangladesh</button>
         `;
-        container.appendChild(div);
+        videoList.appendChild(card);
       });
     }
-  </script>
 
+    async function applyGeoRestriction(videoId, token) {
+      const body = {
+        id: videoId,
+        status: {
+          privacyStatus: "public",
+          selfDeclaredMadeForKids: false,
+          regionRestriction: {
+            allowed: ["BD"]
+          }
+        }
+      };
+
+      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=status`, {
+        method: 'PUT',
+        headers: {
+          Authorization: 'Bearer ' + token,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      });
+
+      if (res.ok) {
+        alert('✅ Geo-restriction applied: Only Bangladesh');
+      } else {
+        alert('❌ Failed to apply restriction');
+      }
+    }
+  </script>
 </body>
 </html>
