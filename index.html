@@ -43,7 +43,7 @@
 
   <script>
     const CLIENT_ID = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
-    const REDIRECT_URI = location.href.split('#')[0];
+    const REDIRECT_URI = "https://saju-live.vercel.app";
     const SCOPES = [
       "https://www.googleapis.com/auth/youtube",
       "https://www.googleapis.com/auth/youtube.readonly",
@@ -65,10 +65,20 @@
       const params = new URLSearchParams(hash);
       const token = params.get("access_token");
       if (token) {
+        const expiry = Date.now() + (3600 * 1000); // 1 hour
         localStorage.setItem("yt_token", token);
+        localStorage.setItem("yt_token_expiry", expiry);
+        window.history.replaceState({}, document.title, REDIRECT_URI); // Clean URL
         return token;
       }
-      return localStorage.getItem("yt_token");
+
+      const savedToken = localStorage.getItem("yt_token");
+      const expiry = parseInt(localStorage.getItem("yt_token_expiry"), 10);
+      if (savedToken && expiry && Date.now() < expiry) {
+        return savedToken;
+      }
+
+      return null;
     }
 
     async function fetchVideos(token) {
@@ -79,7 +89,7 @@
       const container = document.getElementById("videos");
       container.innerHTML = "";
 
-      if (!data.items) {
+      if (!data.items || !data.items.length) {
         container.innerHTML = "<p>No videos found.</p>";
         return;
       }
@@ -100,7 +110,7 @@
 
     async function applyGeoBlock(videoId) {
       const token = getAccessToken();
-      const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=status`, {
+      const res = await fetch("https://www.googleapis.com/youtube/v3/videos?part=status", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -111,21 +121,20 @@
           status: {
             privacyStatus: "public",
             regionalRestriction: {
-              allowed: ["BD"],
-              blocked: ["US", "IN", "GB", "CA", "PK", "DE", "FR", "AU", "BR", "RU", "CN", "JP"]
+              allowed: ["BD"]
             }
           }
         })
       });
 
       if (res.ok) {
-        alert(`Geo-block applied to ${videoId}`);
+        alert(`✅ Geo-block applied to ${videoId}`);
       } else {
-        alert("Failed to apply geo-block");
+        const error = await res.json();
+        alert("❌ Failed to apply geo-block: " + (error.error?.message || "Unknown error"));
       }
     }
 
-    // Auto-run after token
     const token = getAccessToken();
     if (token) {
       document.getElementById("auth-section").style.display = "none";
