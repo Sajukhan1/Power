@@ -3,63 +3,66 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Content Rights Management</title>
+  <title>Rights Management • YouTube Studio</title>
   <style>
     body {
       font-family: Roboto, Arial, sans-serif;
-      background-color: #f1f3f4;
+      background-color: #f9f9f9;
       margin: 0;
-      padding: 20px;
+      padding: 40px 20px;
     }
 
     .container {
       max-width: 960px;
       background: #fff;
       margin: auto;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 40px 30px;
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     }
 
     h2 {
       margin-top: 0;
       color: #202124;
+      font-size: 26px;
+      font-weight: 500;
     }
 
     .form-section {
-      margin-bottom: 30px;
+      margin-bottom: 40px;
     }
 
     .form-section h3 {
-      margin-bottom: 15px;
-      color: #202124;
+      margin-bottom: 16px;
+      color: #333;
+      font-size: 18px;
       border-bottom: 1px solid #ddd;
       padding-bottom: 6px;
     }
 
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     label {
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       font-weight: 500;
-      color: #333;
+      color: #444;
     }
 
     input, select, textarea {
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       font-size: 15px;
       border: 1px solid #ccc;
-      border-radius: 6px;
+      border-radius: 8px;
       box-sizing: border-box;
     }
 
     .form-inline {
       display: flex;
-      gap: 15px;
+      gap: 20px;
       flex-wrap: wrap;
     }
 
@@ -69,18 +72,20 @@
     }
 
     .button-row {
-      text-align: right;
-      margin-top: 30px;
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
     }
 
     button {
-      padding: 10px 25px;
+      padding: 12px 28px;
       font-size: 16px;
       border: none;
-      border-radius: 6px;
+      border-radius: 8px;
       background-color: #065fd4;
       color: white;
       cursor: pointer;
+      transition: 0.3s;
     }
 
     button:hover {
@@ -96,7 +101,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 25px;
+      margin-bottom: 35px;
     }
 
     .step-header span {
@@ -158,8 +163,9 @@
         </div>
       </div>
 
-      <!-- Submit Button -->
+      <!-- Buttons -->
       <div class="button-row">
+        <button type="button" onclick="history.back()">⬅ Back</button>
         <button type="submit">Next ➤</button>
       </div>
     </form>
@@ -182,7 +188,6 @@
 
     document.getElementById('rightsForm').addEventListener('submit', function (e) {
       e.preventDefault();
-      // ✅ Save form data to localStorage (optional)
       const data = {
         policy: uploadPolicy.value,
         ownership: document.getElementById('ownership').value,
@@ -191,7 +196,6 @@
         note: document.getElementById('description').value
       };
       localStorage.setItem('rightsFormData', JSON.stringify(data));
-      // ✅ Redirect to Step 3
       window.location.href = 'geo.html';
     });
   </script>
