@@ -172,9 +172,9 @@
   </div>
 
   <script>
+    // Policy Preview Change
     const uploadPolicy = document.getElementById('uploadPolicy');
     const policyPreview = document.getElementById('policyPreview');
-
     uploadPolicy.addEventListener('change', () => {
       const value = uploadPolicy.value;
       if (value === 'monetize') {
@@ -186,6 +186,16 @@
       }
     });
 
+    // Auto-generate custom ID if empty
+    window.addEventListener('DOMContentLoaded', () => {
+      const customIdInput = document.getElementById('customID');
+      if (!customIdInput.value) {
+        const randomID = 'ID-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+        customIdInput.value = randomID;
+      }
+    });
+
+    // Save and Next
     document.getElementById('rightsForm').addEventListener('submit', function (e) {
       e.preventDefault();
       const data = {
