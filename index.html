@@ -12,7 +12,7 @@
     h1 {
       color: #c00;
     }
-    #loginBtn {
+    #loginBtn, #dashboardBtn {
       background: #c00;
       color: white;
       border: none;
@@ -20,31 +20,7 @@
       font-size: 16px;
       border-radius: 5px;
       cursor: pointer;
-    }
-    .video-item {
-      border: 1px solid #ccc;
-      background: #fff;
-      margin: 10px auto;
-      padding: 10px;
-      width: 90%;
-      border-radius: 10px;
-      box-shadow: 1px 1px 5px rgba(0,0,0,0.1);
-      text-align: left;
-      position: relative;
-    }
-    .edit-icon {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      cursor: pointer;
-      font-size: 18px;
-      color: #c00;
-    }
-    iframe {
-      width: 100%;
-      max-width: 400px;
-      height: 200px;
-      margin-top: 10px;
+      margin: 10px;
     }
   </style>
 </head>
@@ -52,9 +28,8 @@
 
 <h1>YouTube Rights Dashboard</h1>
 <button id="loginBtn">🔐 Login with Google</button>
+<button id="dashboardBtn" style="display:none;">📊 Go to Dashboard</button>
 <div id="status"></div>
-<h2>Your Uploaded Videos</h2>
-<div id="videoList">🔄 Loading...</div>
 
 <script>
 const CLIENT_ID = '85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com';
@@ -95,51 +70,14 @@ window.onload = () => {
     window.history.replaceState({}, document.title, window.location.pathname);
     document.getElementById('status').innerHTML = '✅ Logged in with YouTube';
     document.getElementById('loginBtn').style.display = 'none';
-    loadVideos();
-  } else {
-    document.getElementById('videoList').innerHTML = '🔒 Please log in to view your videos.';
+    document.getElementById('dashboardBtn').style.display = 'inline-block';
+
+    document.getElementById('dashboardBtn').onclick = () => {
+      const dashboardUrl = `dashboard.html#access_token=${token}`;
+      window.location.href = dashboardUrl;
+    };
   }
 };
-
-function loadVideos() {
-  fetch('https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true', {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-  .then(res => res.json())
-  .then(data => {
-    const uploadsId = data.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
-    if (!uploadsId) throw new Error("❌ No uploads playlist found.");
-
-    return fetch(`https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=${uploadsId}&maxResults=20`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-  })
-  .then(res => res.json())
-  .then(data => {
-    const list = document.getElementById('videoList');
-    list.innerHTML = '';
-    if (!data.items || data.items.length === 0) {
-      list.innerHTML = '❌ No videos found.';
-      return;
-    }
-    data.items.forEach(item => {
-      const videoId = item.snippet.resourceId.videoId;
-      const title = item.snippet.title;
-      const div = document.createElement('div');
-      div.className = 'video-item';
-      div.innerHTML = `
-        <span class="edit-icon" onclick="location.href='rights.html?videoId=${videoId}'">✏️</span>
-        <strong>${title}</strong><br>
-        <iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>
-      `;
-      list.appendChild(div);
-    });
-  })
-  .catch(err => {
-    console.error(err);
-    document.getElementById('videoList').innerText = '❌ Failed to load videos.';
-  });
-}
 </script>
 
 </body>
