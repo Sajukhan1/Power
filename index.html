@@ -6,13 +6,13 @@
   <title>YouTube CMS Dashboard</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: Roboto, Arial, sans-serif;
       background: #f9f9f9;
       margin: 0;
       padding: 20px;
     }
     .container {
-      max-width: 800px;
+      max-width: 900px;
       margin: auto;
     }
     h1 {
@@ -34,12 +34,16 @@
       border-radius: 10px;
       box-shadow: 0 0 8px rgba(0,0,0,0.1);
     }
+    .video-title {
+      font-weight: bold;
+      color: #333;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>YouTube CMS Dashboard</h1>
-    <button onclick="login()">🔐 Login with Google</button>
+    <button id="loginBtn" onclick="login()">🔐 Login with Google</button>
     <div id="user"></div>
     <div id="videos"></div>
   </div>
@@ -49,7 +53,11 @@
     const redirectUri = "https://saju-live.vercel.app/index.html";
     const scopes = [
       "https://www.googleapis.com/auth/youtube.readonly",
-      "https://www.googleapis.com/auth/youtube.force-ssl"
+      "https://www.googleapis.com/auth/youtube.force-ssl",
+      "https://www.googleapis.com/auth/youtube.upload",
+      "https://www.googleapis.com/auth/youtubepartner",
+      "https://www.googleapis.com/auth/youtube",
+      "https://www.googleapis.com/auth/youtubepartner-channel-audit"
     ].join(" ");
 
     let accessToken = null;
@@ -62,20 +70,20 @@
 
     function extractToken() {
       const hash = window.location.hash;
-      if (hash) {
-        const params = new URLSearchParams(hash.substr(1));
+      if (hash.includes("access_token")) {
+        const params = new URLSearchParams(hash.substring(1));
         accessToken = params.get("access_token");
         const expiresIn = parseInt(params.get("expires_in"));
         tokenExpiresAt = Date.now() + (expiresIn * 1000);
         localStorage.setItem("yt_access_token", accessToken);
         localStorage.setItem("yt_token_expiry", tokenExpiresAt);
-        window.location.hash = ""; // clear hash
+        window.location.hash = "";
       } else {
         accessToken = localStorage.getItem("yt_access_token");
         tokenExpiresAt = parseInt(localStorage.getItem("yt_token_expiry"));
         if (accessToken && Date.now() > tokenExpiresAt - 60000) {
-          console.log("Token expired, logging in again...");
-          login(); // Auto-refresh if token is near expiry
+          console.log("🔁 Token expired or near expiry. Logging in again...");
+          login();
         }
       }
     }
@@ -83,7 +91,7 @@
     async function loadVideos() {
       if (!accessToken) return;
 
-      document.getElementById("user").innerText = "✅ Logged in";
+      document.getElementById("user").innerText = "✅ Logged in with YouTube";
 
       const res = await fetch("https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,status&mine=true&maxResults=10", {
         headers: {
@@ -95,8 +103,8 @@
       const videosDiv = document.getElementById("videos");
       videosDiv.innerHTML = "<h2>Your Videos</h2>";
 
-      if (!data.items) {
-        videosDiv.innerHTML += "<p>No videos found or permission denied.</p>";
+      if (!data.items || !data.items.length) {
+        videosDiv.innerHTML += "<p>❌ No videos found or permission denied.</p>";
         return;
       }
 
@@ -104,8 +112,8 @@
         const v = document.createElement("div");
         v.className = "video";
         v.innerHTML = `
-          <strong>🎬 ${video.snippet.title}</strong><br>
-          Video ID: ${video.id}<br>
+          <div class="video-title">🎬 ${video.snippet.title}</div>
+          Video ID: <code>${video.id}</code><br>
           <button onclick="applyRestriction('${video.id}')">🌍 Restrict to Bangladesh Only</button>
         `;
         videosDiv.appendChild(v);
@@ -113,14 +121,14 @@
     }
 
     async function applyRestriction(videoId) {
-      if (!accessToken) return alert("Access token missing!");
+      if (!accessToken) return alert("⚠️ Access token missing!");
 
       const body = {
         id: videoId,
         status: {
-          selfDeclaredMadeForKids: false,
           privacyStatus: "public",
           embeddable: true,
+          selfDeclaredMadeForKids: false,
           regionRestriction: {
             blocked: [ "US", "IN", "PK", "CA", "GB", "AU", "FR", "DE", "RU", "CN", "JP", "SA", "AE", "BR", "IT", "ES", "NG", "MX", "ZA" ]
           }
@@ -137,10 +145,10 @@
       });
 
       if (res.ok) {
-        alert("✅ Geo restriction applied to Bangladesh only!");
+        alert("✅ Geo restriction applied: Only viewable in Bangladesh.");
       } else {
         const err = await res.json();
-        console.error(err);
+        console.error("❌ Error:", err);
         alert("❌ Failed to apply restriction.");
       }
     }
