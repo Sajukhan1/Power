@@ -3,56 +3,51 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Rights Management Panel</title>
+  <title>Content Rights Management</title>
   <style>
     body {
       font-family: Roboto, Arial, sans-serif;
-      background: #f9f9f9;
+      background-color: #f1f3f4;
       margin: 0;
       padding: 20px;
     }
+
     .container {
       max-width: 960px;
+      background: #fff;
       margin: auto;
-      background: white;
       padding: 30px;
       border-radius: 10px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
+
     h2 {
       margin-top: 0;
       color: #202124;
     }
-    .step-nav {
-      display: flex;
-      justify-content: space-between;
+
+    .form-section {
       margin-bottom: 30px;
-      overflow-x: auto;
     }
-    .step {
-      flex: 1;
-      min-width: 100px;
-      text-align: center;
-      padding: 10px;
-      border-bottom: 2px solid #ccc;
-      font-size: 14px;
-      color: #666;
-      white-space: nowrap;
+
+    .form-section h3 {
+      margin-bottom: 15px;
+      color: #202124;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 6px;
     }
-    .step.active {
-      font-weight: bold;
-      color: #065fd4;
-      border-color: #065fd4;
-    }
+
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
+
     label {
       display: block;
       margin-bottom: 6px;
       font-weight: 500;
       color: #333;
     }
+
     input, select, textarea {
       width: 100%;
       padding: 10px;
@@ -61,152 +56,157 @@
       border-radius: 6px;
       box-sizing: border-box;
     }
-    .row {
+
+    .form-inline {
       display: flex;
+      gap: 15px;
       flex-wrap: wrap;
-      gap: 20px;
-    }
-    .row > div {
-      flex: 1;
-      min-width: 200px;
-    }
-    .footer {
-      text-align: right;
-      margin-top: 30px;
-    }
-    .footer button {
-      background-color: #065fd4;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    .footer button:hover {
-      background-color: #054ec0;
     }
 
-    /* Responsive */
-    @media (max-width: 600px) {
-      .row {
-        flex-direction: column;
-      }
+    .form-inline .form-group {
+      flex: 1;
+      min-width: 220px;
+    }
+
+    .button-row {
+      text-align: right;
+      margin-top: 20px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 15px;
+      border: none;
+      border-radius: 6px;
+      background-color: #065fd4;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #054ab8;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #777;
+    }
+
+    .step-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .step-header span {
+      font-size: 14px;
+      color: #666;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Rights Management</h2>
-
-    <div class="step-nav">
-      <div class="step active">Details</div>
-      <div class="step active">Rights management</div>
-      <div class="step">Monetization</div>
-      <div class="step">Ad suitability</div>
-      <div class="step">Video elements</div>
-      <div class="step">Checks</div>
-      <div class="step">Visibility</div>
+    <div class="step-header">
+      <h2>Rights Management</h2>
+      <span>Step 2 of 7</span>
     </div>
 
-    <form id="videoForm">
-      <div class="form-group">
-        <label for="uploadPolicy">Upload Policy</label>
-        <select id="uploadPolicy">
-          <option value="monetize">Monetize in all countries</option>
-          <option value="block">Block in all countries</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Ownership</label>
-        <select id="ownership">
-          <option value="global">Global</option>
-          <option value="territories">Specific territories</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="assetType">Asset type</label>
-        <select id="assetType">
-          <option value="Web">Web</option>
-          <option value="TV">TV</option>
-          <option value="Film">Film</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="assetTitle">Asset title</label>
-        <input type="text" id="assetTitle" required />
-      </div>
-
-      <div class="row">
+    <form id="rightsForm">
+      <!-- Upload Policy -->
+      <div class="form-section">
+        <h3>Upload Policy</h3>
         <div class="form-group">
-          <label for="customId">Custom ID</label>
-          <input type="text" id="customId" placeholder="e.g. BNvEfRoC0lc" />
+          <label for="uploadPolicy">Policy applied to this video</label>
+          <select id="uploadPolicy" required>
+            <option value="monetize">Monetize in all countries</option>
+            <option value="block">Block in all countries</option>
+            <option value="track">Track usage globally</option>
+          </select>
+          <p class="note">Policy preview: <strong id="policyPreview">Monetize it • Worldwide</strong></p>
+        </div>
+      </div>
+
+      <!-- Ownership -->
+      <div class="form-section">
+        <h3>Ownership</h3>
+        <div class="form-group">
+          <label for="ownership">Select ownership type</label>
+          <select id="ownership" required>
+            <option value="global">Global</option>
+            <option value="specific">Specific Territories</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Asset Info -->
+      <div class="form-section">
+        <h3>Asset Information</h3>
+        <div class="form-inline">
+          <div class="form-group">
+            <label for="assetTitle">Asset Title</label>
+            <input type="text" id="assetTitle" placeholder="e.g. Godi Utha Ke Mazza Marlo (Official)" required>
+          </div>
+
+          <div class="form-group">
+            <label for="customId">Custom ID</label>
+            <input type="text" id="customId" placeholder="e.g. GULSHAN12345">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="assetType">Asset Type</label>
+          <select id="assetType">
+            <option value="Web">Web</option>
+            <option value="TV">TV</option>
+            <option value="Film">Film</option>
+            <option value="Music">Music</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Asset Description</label>
+          <textarea id="description" rows="3" placeholder="Describe this asset in detail..."></textarea>
         </div>
 
         <div class="form-group">
           <label for="notes">Notes</label>
-          <textarea id="notes" rows="3" placeholder="Add notes..."></textarea>
+          <textarea id="notes" rows="2" placeholder="Optional internal notes..."></textarea>
         </div>
       </div>
 
-      <div class="form-group">
-        <label for="description">Asset description</label>
-        <textarea id="description" rows="4" placeholder="Describe the asset..."></textarea>
-      </div>
-
-      <div class="footer">
+      <div class="button-row">
         <button type="submit">NEXT</button>
       </div>
     </form>
   </div>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const videoId = params.get("videoId");
+    const policyPreview = document.getElementById("policyPreview");
+    document.getElementById("uploadPolicy").addEventListener("change", function () {
+      const value = this.value;
+      if (value === "monetize") policyPreview.innerText = "Monetize it • Worldwide";
+      else if (value === "block") policyPreview.innerText = "Block it • Worldwide";
+      else if (value === "track") policyPreview.innerText = "Track usage • Worldwide";
+    });
 
-    if (!videoId) {
-      alert("❌ Video ID not found in URL (expected ?videoId=...)");
-    }
-
-    // Fetch metadata (you can replace this with actual API call)
-    window.onload = async () => {
-      const mockData = {
-        assetType: "Web",
-        assetTitle: "India v Pakistan Asia Cup 2022 | Full Match",
-        customId: "BNvEfRoC0lc",
-        notes: "Major event match",
-        description: "Full match highlights of India vs Pakistan Asia Cup 2022.",
-        uploadPolicy: "monetize",
-        ownership: "global"
-      };
-
-      document.getElementById("assetType").value = mockData.assetType;
-      document.getElementById("assetTitle").value = mockData.assetTitle;
-      document.getElementById("customId").value = mockData.customId;
-      document.getElementById("notes").value = mockData.notes;
-      document.getElementById("description").value = mockData.description;
-      document.getElementById("uploadPolicy").value = mockData.uploadPolicy;
-      document.getElementById("ownership").value = mockData.ownership;
-    };
-
-    document.getElementById("videoForm").addEventListener("submit", function (e) {
+    document.getElementById("rightsForm").addEventListener("submit", function (e) {
       e.preventDefault();
 
-      const data = {
-        videoId: videoId,
-        assetType: document.getElementById("assetType").value,
+      const formData = {
+        policy: document.getElementById("uploadPolicy").value,
+        ownership: document.getElementById("ownership").value,
         assetTitle: document.getElementById("assetTitle").value,
         customId: document.getElementById("customId").value,
-        notes: document.getElementById("notes").value,
+        assetType: document.getElementById("assetType").value,
         description: document.getElementById("description").value,
-        uploadPolicy: document.getElementById("uploadPolicy").value,
-        ownership: document.getElementById("ownership").value
+        notes: document.getElementById("notes").value
       };
 
-      alert("✅ Saved Data:\n\n" + JSON.stringify(data, null, 2));
+      console.log("🔐 Collected Data:", formData);
+      alert("✅ Rights info saved:\n" + JSON.stringify(formData, null, 2));
+
+      // Here you'd POST to your backend or YouTube API if connected
     });
   </script>
 </body>
