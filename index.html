@@ -68,10 +68,8 @@ const SCOPES = [
   'https://www.googleapis.com/auth/youtube.channel-memberships.creator'
 ].join(' ');
 
-// Global token
 let token = null;
 
-// Auto-refresh setup
 function setTokenRefreshTimer(expiry = 3300) {
   setTimeout(() => {
     console.log('🔁 Token expiring. Reauthenticating...');
@@ -79,17 +77,14 @@ function setTokenRefreshTimer(expiry = 3300) {
   }, expiry * 1000);
 }
 
-// Start Google Auth
 function startAuth() {
-  const redirectUri = window.location.origin + window.location.pathname;
+  const redirectUri = window.location.origin;
   const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=${encodeURIComponent(SCOPES)}&include_granted_scopes=true&prompt=consent`;
   window.location.href = authUrl;
 }
 
-// Login button click
 document.getElementById('loginBtn').onclick = () => startAuth();
 
-// Page load
 window.onload = () => {
   const hash = window.location.hash;
   if (hash.includes('access_token')) {
@@ -106,7 +101,6 @@ window.onload = () => {
   }
 };
 
-// Load videos
 function loadVideos() {
   fetch('https://www.googleapis.com/youtube/v3/channels?part=contentDetails&mine=true', {
     headers: { Authorization: `Bearer ${token}` }
