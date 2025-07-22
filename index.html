@@ -1,63 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>YouTube Network Login</title>
+  <title>YouTube Login</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #0f0f0f;
-      color: #fff;
+      font-family: Arial;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      flex-direction: column;
+      background: #f4f4f4;
     }
     button {
-      padding: 15px 25px;
-      font-size: 18px;
-      background-color: #FF0000;
+      font-size: 20px;
+      padding: 12px 24px;
+      cursor: pointer;
+      background-color: red;
       color: white;
       border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: 0.3s ease;
-    }
-    button:hover {
-      background-color: #cc0000;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body>
-
-  <h1>YouTube Studio Network Login</h1>
-  <button onclick="login()">Sign in with Google</button>
+  <button onclick="login()">Login with YouTube</button>
 
   <script>
     function login() {
       const clientId = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
-      const redirectUri = "https://saju-live.vercel.app";
+      const redirectUri = window.location.origin + "/callback.html"; // ✅ your own hosted callback.html
       const scope = [
-        "https://www.googleapis.com/auth/youtubepartner",
-        "https://www.googleapis.com/auth/youtubepartner-channel-audit",
-        "https://www.googleapis.com/auth/youtube.content-owner.readonly",
-        "https://www.googleapis.com/auth/youtube.rights"
-      ].join(' ');
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scope)}&include_granted_scopes=true`;
+        "https://www.googleapis.com/auth/youtube.upload",
+        "https://www.googleapis.com/auth/youtube.force-ssl"
+      ].join(" ");
+
+      const authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&response_type=token&include_granted_scopes=true`;
 
       window.location.href = authUrl;
     }
-
-    // Auto redirect to YouTube Studio Network tab after login
-    window.onload = function () {
-      const hash = window.location.hash;
-      if (hash.includes("access_token")) {
-        // Optional: You can store the token if needed
-        window.location.href = "https://studio.youtube.com/channel/UC/network";
-      }
-    };
   </script>
 </body>
 </html>
