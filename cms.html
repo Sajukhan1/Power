@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>YouTube CMS - BD Upload Panel</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #cc0000;
+      font-size: 24px;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 20px;
+      background-color: #cc0000;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:hover {
+      background-color: #b30000;
+    }
+    .note {
+      margin-top: 20px;
+      color: gray;
+      font-size: 14px;
+    }
+    .geo-box {
+      background: #f1f1f1;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📺 YouTube CMS Upload Panel</h1>
+
+    <label for="videoTitle">🎬 ভিডিওর টাইটেল</label>
+    <input type="text" id="videoTitle" placeholder="উদাহরণ: নাটক পর্ব ১"/>
+
+    <label for="videoFile">📁 MP4 ফাইল আপলোড করো</label>
+    <input type="file" id="videoFile" accept="video/mp4" />
+
+    <label for="thumbnail">🖼️ থাম্বনেইল আপলোড করো</label>
+    <input type="file" id="thumbnail" accept="image/*" />
+
+    <div class="geo-box">
+      <h3>🌍 দেশভিত্তিক রেস্ট্রিকশন</h3>
+      <p>✅ শুধু <b>বাংলাদেশ</b>ে দেখানো হবে<br>❌ অন্য সব দেশে ব্লক থাকবে</p>
+    </div>
+
+    <button onclick="submitVideo()">⏫ আপলোড করো</button>
+
+    <div class="note">
+      ⚠️ নোট: এই আপলোড সিস্টেমটি শুধু আপনার নিজের হোস্টে কাজ করবে। ভিডিও গুলো Google API তে রিয়েল ক্লেইম বসানোর জন্য ভবিষ্যতে ব্যাকএন্ড যুক্ত করা হবে।
+    </div>
+  </div>
+
+  <script>
+    function submitVideo() {
+      const title = document.getElementById('videoTitle').value;
+      const video = document.getElementById('videoFile').files[0];
+      const thumb = document.getElementById('thumbnail').files[0];
+
+      if (!title || !video) {
+        alert("🎯 টাইটেল ও ভিডিও ফাইল দিতে হবে!");
+        return;
+      }
+
+      alert(`✅ ${title} আপলোড প্রসেস শুরু হয়েছে (লোকাল ডেমো)।`);
+      // Future: API integration or save to server
+    }
+  </script>
+</body>
+</html>
