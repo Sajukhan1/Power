@@ -3,24 +3,8 @@
 <head>
   <title>YouTube Login</title>
   <style>
-    body {
-      font-family: Arial;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: #f4f4f4;
-    }
-    button {
-      font-size: 20px;
-      padding: 12px 24px;
-      cursor: pointer;
-      background-color: red;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
+    body { font-family: Arial; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f9f9f9; }
+    button { font-size: 20px; padding: 12px 24px; background-color: #cc0000; color: white; border: none; border-radius: 6px; }
   </style>
 </head>
 <body>
@@ -29,13 +13,12 @@
   <script>
     function login() {
       const clientId = "85663030723-3j3l4cv4c28jv62kbp5vslj4cu6o59nu.apps.googleusercontent.com";
-      const redirectUri = window.location.origin + "/callback.html"; // ✅ your own hosted callback.html
+      const redirectUri = "https://saju-live.vercel.app/callback.html";
       const scope = [
         "https://www.googleapis.com/auth/youtube.upload",
         "https://www.googleapis.com/auth/youtube.force-ssl"
       ].join(" ");
-
-      const authUrl = `https://accounts.google.com/o/oauth2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=${encodeURIComponent(scope)}&response_type=token&include_granted_scopes=true`;
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=token&scope=${encodeURIComponent(scope)}&include_granted_scopes=true`;
 
       window.location.href = authUrl;
     }
