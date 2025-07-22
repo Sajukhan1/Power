@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Token Received</title>
+</head>
+<body>
+  <script>
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const accessToken = hashParams.get("access_token");
+    if (accessToken) {
+      localStorage.setItem("yt_access_token", accessToken);
+      window.location.href = "cms.html";
+    } else {
+      document.body.innerHTML = "Access Token missing!";
+    }
+  </script>
+</body>
+</html>
