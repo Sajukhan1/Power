@@ -1,34 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>YouTube Uploader Panel</title>
+  <title>YouTube Video Upload + Geo-Restrict</title>
   <style>
-    body { font-family: Arial; padding: 30px; background: #f9f9f9; }
-    input, textarea, button { display: block; margin: 15px 0; padding: 10px; width: 100%; max-width: 600px; }
-    button { background: #cc0000; color: white; border: none; font-weight: bold; border-radius: 6px; cursor: pointer; }
+    body { font-family: Arial; padding: 20px; background: #f8f8f8; }
+    h2 { color: #222; }
+    input, textarea {
+      display: block;
+      margin: 10px 0;
+      padding: 10px;
+      width: 100%;
+      max-width: 400px;
+    }
+    button {
+      background: #cc0000;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
   <h2>YouTube Video Upload + Geo-Restrict (BD Only)</h2>
 
-  <input type="file" id="videoFile" accept="video/mp4">
+  <input type="file" id="videoFile" accept="video/*">
   <input type="text" id="title" placeholder="Video Title">
   <textarea id="description" placeholder="Video Description"></textarea>
   <input type="text" id="tags" placeholder="Comma-separated tags (e.g. music,bd,funny)">
-
   <button onclick="uploadVideo()">Upload & Geo-Restrict</button>
 
-  <div id="status"></div>
+  <div id="result"></div>
 
   <script>
     async function uploadVideo() {
-      const accessToken = localStorage.getItem("yt_access_token");
-      if (!accessToken) return alert("Token missing. Please login again.");
+      const token = localStorage.getItem("yt_access_token");
+      if (!token) return alert("Access token not found. Please login again.");
 
-      const videoFile = document.getElementById("videoFile").files[0];
+      const file = document.getElementById("videoFile").files[0];
       const title = document.getElementById("title").value;
       const description = document.getElementById("description").value;
       const tags = document.getElementById("tags").value.split(",");
+
+      if (!file || !title || !description) {
+        return alert("All fields are required.");
+      }
 
       const metadata = {
         snippet: { title, description, tags },
@@ -37,45 +54,46 @@
 
       const form = new FormData();
       form.append("snippet", new Blob([JSON.stringify(metadata)], { type: "application/json" }));
-      form.append("video", videoFile);
+      form.append("video", file);
 
-      document.getElementById("status").innerText = "Uploading...";
+      document.getElementById("result").innerText = "Uploading...";
 
-      const uploadRes = await fetch("https://www.googleapis.com/upload/youtube/v3/videos?part=snippet,status", {
-        method: "POST",
-        headers: { Authorization: "Bearer " + accessToken },
-        body: form
-      });
-
-      const uploadJson = await uploadRes.json();
-      const videoId = uploadJson.id;
-
-      if (videoId) {
-        document.getElementById("status").innerText = "Upload successful! Applying geo restriction...";
-
-        const restrictRes = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails`, {
-          method: "PUT",
-          headers: {
-            "Authorization": "Bearer " + accessToken,
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            id: videoId,
-            contentDetails: {
-              regionRestriction: {
-                allowed: ["BD"]
-              }
-            }
-          })
+      try {
+        const res = await fetch("https://www.googleapis.com/upload/youtube/v3/videos?part=snippet,status", {
+          method: "POST",
+          headers: { Authorization: "Bearer " + token },
+          body: form
         });
 
-        if (restrictRes.ok) {
-          document.getElementById("status").innerText = `✅ Upload & geo-block success! Video ID: ${videoId}`;
+        const data = await res.json();
+
+        if (data.id) {
+          document.getElementById("result").innerText = "Uploaded! Applying Geo Restriction...";
+
+          // Apply Geo Restriction: Only Bangladesh
+          await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails`, {
+            method: "PUT",
+            headers: {
+              Authorization: "Bearer " + token,
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              id: data.id,
+              contentDetails: {
+                regionRestriction: {
+                  allowed: ["BD"]
+                }
+              }
+            })
+          });
+
+          document.getElementById("result").innerText = "✅ Video uploaded and restricted to BD!";
         } else {
-          document.getElementById("status").innerText = `Upload done, but geo-block failed.`;
+          document.getElementById("result").innerText = "❌ Upload failed.";
         }
-      } else {
-        document.getElementById("status").innerText = "Upload failed!";
+      } catch (err) {
+        console.error(err);
+        document.getElementById("result").innerText = "❌ Error occurred during upload.";
       }
     }
   </script>
